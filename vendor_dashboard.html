@@ -67,7 +67,7 @@
 <body>
   <header>
     <div class="logo">Food<span>Station</span> <span style="font-size:12px; font-weight:600; color:var(--text-sub); letter-spacing:0; margin-left:8px;">VENDOR</span></div>
-    <div class="nav"><a href="/index.html">Home</a><a href="#">Settings</a></div>
+    <div class="nav"><a href="/portal_login.html">Home</a><a href="#">Settings</a></div>
   </header>
 
   <div class="container">
@@ -156,7 +156,7 @@
           highlightMsg.innerHTML = 'New Order Received & Highlighted! Redirecting to Admin...';
           setTimeout(() => {
             sessionStorage.setItem('simulation', 'admin');
-            window.location.href = 'food_delivery_admin_dashboard.html';
+            window.location.href = 'admin_dashboard.html';
           }, 3500);
         }
       }, 500);

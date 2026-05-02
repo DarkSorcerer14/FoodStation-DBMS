@@ -139,7 +139,7 @@
   <script>
     function startSimulation() {
       sessionStorage.setItem('simulation', 'customer');
-      window.location.href = 'customer.html';
+      window.location.href = 'customer_portal.html';
     }
   </script>
 
@@ -184,11 +184,11 @@
 
       setTimeout(() => {
         if (role === 'customer') {
-          window.location.href = '/customer.html';
+          window.location.href = '/customer_portal.html';
         } else if (role === 'vendor') {
-          window.location.href = '/vendor.html';
+          window.location.href = '/vendor_dashboard.html';
         } else if (role === 'admin') {
-          window.location.href = '/food_delivery_admin_dashboard.html';
+          window.location.href = '/admin_dashboard.html';
         }
       }, 800);
     }

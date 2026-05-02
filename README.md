@@ -19,12 +19,12 @@ FoodStation is a full-stack multi-vendor food delivery platform developed as a D
 | **Database** | MySQL |
 
 ## Project Structure
-- `index.html`: Entry point featuring role-based authentication simulation and system flow triggers.
-- `customer.html`: Primary interface for customer browsing and order placement.
-- `vendor.html`: Management interface for restaurant owners to process orders.
-- `food_delivery_admin_dashboard.html`: Comprehensive administrative dashboard for platform oversight.
-- `server.js`: Express application handling REST API endpoints and database connectivity.
-- `schema.sql`: Database definition and initial data seeding script.
+- `portal_login.html`: Entry point featuring role-based authentication simulation and system flow triggers.
+- `customer_portal.html`: Primary interface for customer browsing and order placement.
+- `vendor_dashboard.html`: Management interface for restaurant owners to process orders.
+- `admin_dashboard.html`: Comprehensive administrative dashboard for platform oversight.
+- `app_server.js`: Express application handling REST API endpoints and database connectivity.
+- `database_setup.sql`: Database definition and initial data seeding script.
 - `.env`: Secure configuration for database credentials and environment variables.
 
 ## Installation and Setup
@@ -35,7 +35,7 @@ FoodStation is a full-stack multi-vendor food delivery platform developed as a D
 
 ### Database Initialization
 1. Create a new MySQL database named `fooddeliverydb`.
-2. Execute the `schema.sql` script to initialize tables and seed the initial dataset.
+2. Execute the `database_setup.sql` script to initialize tables and seed the initial dataset.
 
 ### Configuration
 Configure your database credentials by creating a `.env` file in the root directory:
@@ -53,9 +53,9 @@ DB_NAME=fooddeliverydb
    ```
 2. Start the application server:
    ```bash
-   node server.js
+   node app_server.js
    ```
-3. Access the application by opening `index.html` in a web browser or navigating to `http://localhost:3000`.
+3. Access the application by opening `portal_login.html` in a web browser or navigating to `http://localhost:3000`.
 
 ## API Documentation
 | Method | Endpoint | Description |

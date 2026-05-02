@@ -31,11 +31,11 @@ A full-stack multi-vendor food delivery platform (like EatSure/online food court
 ## File Structure
 | File | Purpose |
 |---|---|
-| `index.html` | Login — role selector, "Run System Simulation" button |
-| `customer.html` | Customer portal — browse, cart, multi-vendor checkout |
-| `vendor.html` | Vendor dashboard — orders with status dropdown, menu items |
-| `food_delivery_admin_dashboard.html` | Admin panel — sidebar nav, metrics, all data tables |
-| `server.js` | Express backend — API endpoints, DB connection, seeding |
+| `portal_login.html` | Login — role selector, "Run System Simulation" button |
+| `customer_portal.html` | Customer portal — browse, cart, multi-vendor checkout |
+| `vendor_dashboard.html` | Vendor dashboard — orders with status dropdown, menu items |
+| `admin_dashboard.html` | Admin panel — sidebar nav, metrics, all data tables |
+| `app_server.js` | Express backend — API endpoints, DB connection, seeding |
 | `.env` | `DB_PASSWORD=DarkSorcerer@014` |
 
 ---
@@ -62,7 +62,7 @@ Columns: `OrderID`, `CustomerID`, `OrderDate`, `TotalAmount`, `OrderStatus`
 Columns: `id`, `name`, `price`, `vendor_id`, `category`, `status`
 
 ### `vendors` (10 vendors)
-Cuisine-specific Unsplash images mapped in `customer.html` vendorImages object.
+Cuisine-specific Unsplash images mapped in `customer_portal.html` vendorImages object.
 
 ---
 
@@ -100,7 +100,7 @@ Uses `sessionStorage` to chain state across pages:
 ## How to Run
 ```bash
 cd "c:\Users\ayush\Downloads\DBMS Project"
-node server.js
+node app_server.js
 # http://localhost:3000
 ```
 Requires MySQL running + `.env` with `DB_PASSWORD=DarkSorcerer@014`.
