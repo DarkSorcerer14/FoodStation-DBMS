@@ -19,7 +19,7 @@ FoodStation is a full-stack multi-vendor food delivery platform developed as a D
 | **Database** | MySQL |
 
 ## Project Structure
-- `portal_login.html`: Entry point featuring role-based authentication simulation and system flow triggers.
+- `index.html`: Entry point featuring role-based authentication simulation and system flow triggers.
 - `customer_portal.html`: Primary interface for customer browsing and order placement.
 - `vendor_dashboard.html`: Management interface for restaurant owners to process orders.
 - `admin_dashboard.html`: Comprehensive administrative dashboard for platform oversight.
@@ -55,7 +55,7 @@ DB_NAME=fooddeliverydb
    ```bash
    node app_server.js
    ```
-3. Access the application by opening `portal_login.html` in a web browser or navigating to `http://localhost:3000`.
+3. Access the application by opening `index.html` in a web browser or navigating to `http://localhost:3000`.
 
 ## API Documentation
 | Method | Endpoint | Description |

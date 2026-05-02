@@ -8,14 +8,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('./')); // Serve static files like html
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/portal_login.html');
-});
-
-app.get('/index.html', (req, res) => {
-  res.sendFile(__dirname + '/portal_login.html');
-});
-
 const db = mysql.createConnection({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',

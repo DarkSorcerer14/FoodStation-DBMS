@@ -31,7 +31,7 @@ A full-stack multi-vendor food delivery platform (like EatSure/online food court
 ## File Structure
 | File | Purpose |
 |---|---|
-| `portal_login.html` | Login — role selector, "Run System Simulation" button |
+| `index.html` | Login — role selector, "Run System Simulation" button |
 | `customer_portal.html` | Customer portal — browse, cart, multi-vendor checkout |
 | `vendor_dashboard.html` | Vendor dashboard — orders with status dropdown, menu items |
 | `admin_dashboard.html` | Admin panel — sidebar nav, metrics, all data tables |
