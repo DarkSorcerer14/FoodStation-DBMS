@@ -14,10 +14,9 @@ FoodStation is a full-stack multi-vendor food delivery platform developed as a D
 ## Technical Stack
 | Layer | Technology |
 |---|---|
-| **Frontend** | Vanilla HTML5, CSS3 (Flexbox/Grid), JavaScript (ES6+) |
+| **Frontend** |HTML5, CSS3, JavaScript |
 | **Backend** | Node.js, Express.js |
 | **Database** | MySQL |
-| **Typography** | DM Sans (via Google Fonts) |
 
 ## Project Structure
 - `index.html`: Entry point featuring role-based authentication simulation and system flow triggers.
