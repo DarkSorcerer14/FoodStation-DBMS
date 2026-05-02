@@ -1,0 +1,1381 @@
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #111111;
+    --primary-hover: #222222;
+    --accent: #E8380D;
+    --accent-light: #F04E23;
+    --bg-main: #F8F8FA;
+    --bg-card: #ffffff;
+    --bg-sidebar: #FAFAFA;
+    --text-main: #111111;
+    --text-muted: #6E6E73;
+    --border: #E8E8EC;
+    --radius: 14px;
+    --shadow: 0 4px 16px rgba(0,0,0,0.03);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0
+  }
+
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: var(--bg-main);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 10;
+  }
+
+  .sidebar-logo {
+    padding: 0 1rem 2rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+  }
+
+  .sidebar-logo h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -1px;
+  }
+
+  .sidebar-logo span {
+    color: var(--accent);
+  }
+
+  .sidebar-logo p {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 5px;
+  }
+
+  .nav-item {
+    padding: 12px 1rem;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 12px;
+    transition: all 0.2s;
+  }
+
+  .nav-item:hover {
+    background: var(--bg-main);
+    color: var(--text-main);
+  }
+
+  .nav-item.active {
+    background: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+
+  /* Main Area */
+  .main {
+    flex: 1;
+    overflow: auto;
+    padding: 2.5rem 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .page {
+    display: none;
+    animation: fadeIn 0.4s ease forwards;
+  }
+
+  .page.active {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Header */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -1px;
+  }
+
+  .page-header p {
+    font-size: 15px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  /* Buttons */
+  .btn {
+    padding: 10px 20px;
+    border-radius: 99px;
+    border: none;
+    background: var(--bg-card);
+    color: var(--text-main);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+  }
+
+  .btn:hover {
+    background: var(--bg-main);
+    transform: translateY(-2px);
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-hover);
+    color: #ffffff;
+  }
+
+  /* Metrics */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px
+  }
+
+  .metric {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    transition: transform 0.3s;
+  }
+
+  .metric:hover {
+    transform: translateY(-5px);
+  }
+
+  .metric-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .metric-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -1px;
+  }
+
+  .metric-sub {
+    font-size: 13px;
+    color: var(--accent);
+    margin-top: 8px;
+    font-weight: 500;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.8rem;
+    box-shadow: var(--shadow);
+  }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 1.5rem;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px
+  }
+
+  /* Tables */
+  .table-wrap {
+    overflow-x: auto
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px
+  }
+
+  th {
+    text-align: left;
+    padding: 12px 15px;
+    color: var(--text-muted);
+    font-weight: 600;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  td {
+    padding: 15px 15px;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+
+  tr:last-child td {
+    border-bottom: none
+  }
+
+  tr:hover td {
+    background: var(--bg-main)
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .badge-success {
+    background: var(--accent-light);
+    color: var(--accent);
+  }
+
+  .badge-warning {
+    background: #fff9db;
+    color: #e67700;
+  }
+
+  .badge-info {
+    background: #e7f5ff;
+    color: #1971c2;
+  }
+
+  .badge-danger {
+    background: #fff5f5;
+    color: #c92a2a;
+  }
+
+  /* Forms */
+  .search-row {
+    display: flex;
+    gap: 12px;
+    align-items: center
+  }
+
+  .search-row input,
+  .search-row select {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 14px;
+    background: var(--bg-card);
+    color: var(--text-main);
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-row input:focus,
+  .search-row select:focus {
+    border-color: var(--accent);
+  }
+
+  /* Miscellaneous */
+  .stars {
+    color: #f5b041;
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 12px
+  }
+
+  .bar-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+    width: 100px;
+    flex-shrink: 0
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 10px;
+    background: var(--bg-main);
+    border-radius: 99px;
+    overflow: hidden
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 1s ease-out;
+  }
+
+  .bar-val {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    width: 40px;
+    text-align: right
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .stat-row:last-child {
+    border: none
+  }
+
+  /* Modals */
+  .modal-backdrop {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-backdrop.open {
+    display: flex;
+    animation: fadeIn 0.2s;
+  }
+
+  .modal {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 2rem;
+    width: 400px;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+    transform: translateY(0);
+  }
+
+  .modal h3 {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 15px
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: var(--accent);
+  }
+
+  .modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 2rem
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--text-muted);
+    transition: color 0.2s;
+  }
+
+  .close-btn:hover {
+    color: var(--text-main);
+  }
+
+  /* Activity */
+  .activity-item {
+    display: flex;
+    gap: 15px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px
+  }
+
+  .activity-item:last-child {
+    border: none
+  }
+
+  .activity-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--primary);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 99px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 999;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .app-wrap {
+    position: relative
+  }
+</style>
+
+<div class="app-wrap">
+  <div class="app">
+    <nav class="sidebar">
+      <div class="sidebar-logo">
+        <h2>Food<span>Station</span></h2>
+        <p>Admin Panel</p>
+      </div>
+      <div class="nav-item active" onclick="nav('dashboard',this)"><span class="nav-dot"></span>Dashboard</div>
+      <div class="nav-item" onclick="nav('customers',this)"><span class="nav-dot"></span>Customers</div>
+      <div class="nav-item" onclick="nav('vendors',this)"><span class="nav-dot"></span>Vendors</div>
+      <div class="nav-item" onclick="nav('orders',this)"><span class="nav-dot"></span>Orders</div>
+      <div class="nav-item" onclick="nav('menu',this)"><span class="nav-dot"></span>Food Items</div>
+      <div class="nav-item" onclick="nav('payments',this)"><span class="nav-dot"></span>Payments</div>
+      <div class="nav-item" onclick="nav('delivery',this)"><span class="nav-dot"></span>Delivery</div>
+    </nav>
+
+    <main class="main">
+
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <h1>Dashboard</h1>
+            <p>Overview of your platform</p>
+          </div>
+
+        </div>
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-label">Total orders</div>
+            <div class="metric-value">10</div>
+            <div class="metric-sub">All time</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Revenue</div>
+            <div class="metric-value">₹2,160</div>
+            <div class="metric-sub">All transactions</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Active vendors</div>
+            <div class="metric-value">10</div>
+            <div class="metric-sub">Registered</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Customers</div>
+            <div class="metric-value">10</div>
+            <div class="metric-sub">Registered</div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-title">Revenue by vendor</div>
+            <div class="bar-row">
+              <div class="bar-label">Spice Hub</div>
+              <div class="bar-track">
+                <div class="bar-fill" style="width:78%;background:#185FA5"></div>
+              </div>
+              <div class="bar-val">₹250</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">Biryani House</div>
+              <div class="bar-track">
+                <div class="bar-fill" style="width:62%;background:#185FA5"></div>
+              </div>
+              <div class="bar-val">₹220</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">Paneer Pizza</div>
+              <div class="bar-track">
+                <div class="bar-fill" style="width:100%;background:#185FA5"></div>
+              </div>
+              <div class="bar-val">₹350</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">Butter Chicken</div>
+              <div class="bar-track">
+                <div class="bar-fill" style="width:88%;background:#185FA5"></div>
+              </div>
+              <div class="bar-val">₹280</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">Others</div>
+              <div class="bar-track">
+                <div class="bar-fill" style="width:45%;background:#185FA5"></div>
+              </div>
+              <div class="bar-val">₹210</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Payment methods</div>
+            <div class="stat-row"><span>UPI</span><span style="font-weight:500">4 transactions</span></div>
+            <div class="stat-row"><span>Credit Card</span><span style="font-weight:500">2 transactions</span></div>
+            <div class="stat-row"><span>Cash on Delivery</span><span style="font-weight:500">2 transactions</span></div>
+            <div class="stat-row"><span>Debit Card</span><span style="font-weight:500">1 transaction</span></div>
+            <div class="stat-row"><span>Net Banking</span><span style="font-weight:500">1 transaction</span></div>
+            <div style="margin-top:1rem;padding-top:1rem;border-top:0.5px solid var(--color-border-tertiary)">
+              <div class="stat-row"><span>Completed</span><span class="badge badge-success">7</span></div>
+              <div class="stat-row"><span>Pending</span><span class="badge badge-warning">3</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Recent activity</div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--color-background-success)"></div>
+            <div>
+              <div>Order #10 placed by Pooja Iyer — ₹120 (Processing)</div>
+              <div style="font-size:11px;color:var(--color-text-secondary)">Mar 10, 2024</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--color-background-success)"></div>
+            <div>
+              <div>Order #9 delivered to Rohit Das — ₹280</div>
+              <div style="font-size:11px;color:var(--color-text-secondary)">Mar 9, 2024</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--color-background-info)"></div>
+            <div>
+              <div>Order #7 placed by Vikram Patel — ₹350 (Placed)</div>
+              <div style="font-size:11px;color:var(--color-text-secondary)">Mar 7, 2024</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--color-background-warning)"></div>
+            <div>
+              <div>Payment pending for Order #6 — Cash on Delivery</div>
+              <div style="font-size:11px;color:var(--color-text-secondary)">Mar 6, 2024</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-customers">
+        <div class="page-header">
+          <div>
+            <h1>Customers</h1>
+            <p>Manage registered customers</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-add-customer')">+ Add customer</button>
+        </div>
+        <div class="card">
+          <div class="search-row" style="margin-bottom:1rem">
+            <input type="text" placeholder="Search by name or email..." oninput="filterTable(this,'cust-table')" />
+            <select onchange="filterTableByCol(this,'cust-table',4)">
+              <option value="">All cities</option>
+              <option>Chennai</option>
+              <option>Bangalore</option>
+              <option>Mumbai</option>
+              <option>Delhi</option>
+              <option>Hyderabad</option>
+              <option>Pune</option>
+              <option>Kolkata</option>
+              <option>Ahmedabad</option>
+              <option>Kerala</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table id="cust-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>City</th>
+                </tr>
+              </thead>
+              <tbody id="customer-tbody">
+                <!-- Dynamically populated from backend -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-vendors">
+        <div class="page-header">
+          <div>
+            <h1>Vendors</h1>
+            <p>Manage registered restaurants</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-add-vendor')">+ Add vendor</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Restaurant</th>
+                  <th>Location</th>
+                  <th>Contact</th>
+                  <th>Rating</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="vendor-tbody">
+                <!-- Dynamically populated from backend -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-orders">
+        <div class="page-header">
+          <div>
+            <h1>Orders</h1>
+            <p>View and manage all orders</p>
+          </div>
+          <select
+            style="padding:7px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;background:var(--color-background-primary);color:var(--color-text-primary)"
+            onchange="filterOrderStatus(this)">
+            <option value="">All statuses</option>
+            <option>Delivered</option>
+            <option>Processing</option>
+            <option>Placed</option>
+          </select>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table id="order-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Payment</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#1</td>
+                  <td>Rahul Sharma</td>
+                  <td>Mar 1, 2024</td>
+                  <td>₹330</td>
+                  <td><span class="badge badge-success">Delivered</span></td>
+                  <td><span class="badge badge-success">Completed</span></td>
+                </tr>
+                <tr>
+                  <td>#2</td>
+                  <td>Karan Mehta</td>
+                  <td>Mar 2, 2024</td>
+                  <td>₹120</td>
+                  <td><span class="badge badge-success">Delivered</span></td>
+                  <td><span class="badge badge-success">Completed</span></td>
+                </tr>
+                <tr>
+                  <td>#3</td>
+                  <td>Anita Verma</td>
+                  <td>Mar 3, 2024</td>
+                  <td>₹250</td>
+                  <td><span class="badge badge-info">Processing</span></td>
+                  <td><span class="badge badge-warning">Pending</span></td>
+                </tr>
+                <tr>
+                  <td>#4</td>
+                  <td>Priya Nair</td>
+                  <td>Mar 4, 2024</td>
+                  <td>₹300</td>
+                  <td><span class="badge badge-info">Placed</span></td>
+                  <td><span class="badge badge-success">Completed</span></td>
+                </tr>
+                <tr>
+                  <td>#5</td>
+                  <td>Amit Singh</td>
+                  <td>Mar 5, 2024</td>
+                  <td>₹90</td>
+                  <td><span class="badge badge-success">Delivered</span></td>
+                  <td><span class="badge badge-success">Completed</span></td>
+                </tr>
+                <tr>
+                  <td>#6</td>
+                  <td>Sneha Reddy</td>
+                  <td>Mar 6, 2024</td>
+                  <td>₹220</td>
+                  <td><span class="badge badge-info">Processing</span></td>
+                  <td><span class="badge badge-warning">Pending</span></td>
+                </tr>
+                <tr>
+                  <td>#7</td>
+                  <td>Vikram Patel</td>
+                  <td>Mar 7, 2024</td>
+                  <td>₹350</td>
+                  <td><span class="badge badge-info">Placed</span></td>
+                  <td><span class="badge badge-success">Completed</span></td>
+                </tr>
+                <tr>
+                  <td>#8</td>
+                  <td>Neha Kapoor</td>
+                  <td>Mar 8, 2024</td>
+                  <td>₹100</td>
+                  <td><span class="badge badge-success">Delivered</span></td>
+                  <td><span class="badge badge-success">Completed</span></td>
+                </tr>
+                <tr>
+                  <td>#9</td>
+                  <td>Rohit Das</td>
+                  <td>Mar 9, 2024</td>
+                  <td>₹280</td>
+                  <td><span class="badge badge-success">Delivered</span></td>
+                  <td><span class="badge badge-success">Completed</span></td>
+                </tr>
+                <tr>
+                  <td>#10</td>
+                  <td>Pooja Iyer</td>
+                  <td>Mar 10, 2024</td>
+                  <td>₹120</td>
+                  <td><span class="badge badge-info">Processing</span></td>
+                  <td><span class="badge badge-warning">Pending</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-menu">
+        <div class="page-header">
+          <div>
+            <h1>Food items</h1>
+            <p>Manage menu across all vendors</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-add-food')">+ Add item</button>
+        </div>
+        <div class="card">
+          <div class="search-row" style="margin-bottom:1rem">
+            <input type="text" placeholder="Search food items..." oninput="filterTable(this,'food-table')" />
+            <select onchange="filterTableByCol(this,'food-table',3)">
+              <option value="">All vendors</option>
+              <option>Spice Hub</option>
+              <option>Sweet Treats</option>
+              <option>Burger Point</option>
+              <option>Pizza Palace</option>
+              <option>Dosa Corner</option>
+              <option>Biryani House</option>
+              <option>Tandoori Nights</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table id="food-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Price</th>
+                  <th>Vendor</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Paneer Butter Masala</td>
+                  <td>₹250</td>
+                  <td>Spice Hub</td>
+                  <td>Main course</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Gulab Jamun</td>
+                  <td>₹80</td>
+                  <td>Sweet Treats</td>
+                  <td>Dessert</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>Veg Burger</td>
+                  <td>₹120</td>
+                  <td>Burger Point</td>
+                  <td>Snack</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>Chocolate Cake</td>
+                  <td>₹150</td>
+                  <td>Sweet Treats</td>
+                  <td>Dessert</td>
+                  <td><span class="badge badge-danger">Out of stock</span></td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>Margherita Pizza</td>
+                  <td>₹300</td>
+                  <td>Pizza Palace</td>
+                  <td>Main course</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>Masala Dosa</td>
+                  <td>₹90</td>
+                  <td>Dosa Corner</td>
+                  <td>Breakfast</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>Chicken Biryani</td>
+                  <td>₹220</td>
+                  <td>Biryani House</td>
+                  <td>Main course</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>Paneer Pizza</td>
+                  <td>₹350</td>
+                  <td>Pizza Palace</td>
+                  <td>Main course</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>Rava Dosa</td>
+                  <td>₹100</td>
+                  <td>Dosa Corner</td>
+                  <td>Breakfast</td>
+                  <td><span class="badge badge-danger">Out of stock</span></td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>Butter Chicken</td>
+                  <td>₹280</td>
+                  <td>Tandoori Nights</td>
+                  <td>Main course</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-payments">
+        <div class="page-header">
+          <div>
+            <h1>Payments</h1>
+            <p>Track all transactions</p>
+          </div>
+        </div>
+        <div class="metrics" style="grid-template-columns:repeat(3,1fr)">
+          <div class="metric">
+            <div class="metric-label">Total collected</div>
+            <div class="metric-value">₹1,720</div>
+            <div class="metric-sub">7 completed</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Pending</div>
+            <div class="metric-value">₹590</div>
+            <div class="metric-sub">3 transactions</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Success rate</div>
+            <div class="metric-value">70%</div>
+            <div class="metric-sub">Of all payments</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Payment ID</th>
+                  <th>Order</th>
+                  <th>Method</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#1</td>
+                  <td>Order #1</td>
+                  <td>UPI</td>
+                  <td><span class="badge badge-success">Completed</span></td>
+                  <td>Mar 1, 2024 12:31</td>
+                </tr>
+                <tr>
+                  <td>#2</td>
+                  <td>Order #2</td>
+                  <td>Credit Card</td>
+                  <td><span class="badge badge-success">Completed</span></td>
+                  <td>Mar 2, 2024 14:20</td>
+                </tr>
+                <tr>
+                  <td>#3</td>
+                  <td>Order #3</td>
+                  <td>Cash on Delivery</td>
+                  <td><span class="badge badge-warning">Pending</span></td>
+                  <td>Mar 3, 2024 18:50</td>
+                </tr>
+                <tr>
+                  <td>#4</td>
+                  <td>Order #4</td>
+                  <td>UPI</td>
+                  <td><span class="badge badge-success">Completed</span></td>
+                  <td>Mar 4, 2024 10:20</td>
+                </tr>
+                <tr>
+                  <td>#5</td>
+                  <td>Order #5</td>
+                  <td>Debit Card</td>
+                  <td><span class="badge badge-success">Completed</span></td>
+                  <td>Mar 5, 2024 13:50</td>
+                </tr>
+                <tr>
+                  <td>#6</td>
+                  <td>Order #6</td>
+                  <td>Cash on Delivery</td>
+                  <td><span class="badge badge-warning">Pending</span></td>
+                  <td>Mar 6, 2024 19:35</td>
+                </tr>
+                <tr>
+                  <td>#7</td>
+                  <td>Order #7</td>
+                  <td>Credit Card</td>
+                  <td><span class="badge badge-success">Completed</span></td>
+                  <td>Mar 7, 2024 20:05</td>
+                </tr>
+                <tr>
+                  <td>#8</td>
+                  <td>Order #8</td>
+                  <td>UPI</td>
+                  <td><span class="badge badge-success">Completed</span></td>
+                  <td>Mar 8, 2024 11:25</td>
+                </tr>
+                <tr>
+                  <td>#9</td>
+                  <td>Order #9</td>
+                  <td>Net Banking</td>
+                  <td><span class="badge badge-success">Completed</span></td>
+                  <td>Mar 9, 2024 15:15</td>
+                </tr>
+                <tr>
+                  <td>#10</td>
+                  <td>Order #10</td>
+                  <td>UPI</td>
+                  <td><span class="badge badge-warning">Pending</span></td>
+                  <td>Mar 10, 2024 18:05</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-delivery">
+        <div class="page-header">
+          <div>
+            <h1>Delivery partners</h1>
+            <p>Manage delivery personnel</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-add-delivery')">+ Add partner</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Vehicle</th>
+                  <th>Avg time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Arjun</td>
+                  <td>9998887777</td>
+                  <td>Bike</td>
+                  <td>35 min</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Ravi</td>
+                  <td>9887776666</td>
+                  <td>Scooter</td>
+                  <td>25 min</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>Manoj</td>
+                  <td>9776665555</td>
+                  <td>Bike</td>
+                  <td>40 min</td>
+                  <td><span class="badge badge-warning">On delivery</span></td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>Suresh</td>
+                  <td>9665554444</td>
+                  <td>Bike</td>
+                  <td>30 min</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>Deepak</td>
+                  <td>9554443333</td>
+                  <td>Scooter</td>
+                  <td>28 min</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>Ramesh</td>
+                  <td>9443332222</td>
+                  <td>Bike</td>
+                  <td>45 min</td>
+                  <td><span class="badge badge-warning">On delivery</span></td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>Kiran</td>
+                  <td>9332221111</td>
+                  <td>Bike</td>
+                  <td>35 min</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>Ajay</td>
+                  <td>9221110000</td>
+                  <td>Scooter</td>
+                  <td>20 min</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>Naveen</td>
+                  <td>9110009999</td>
+                  <td>Bike</td>
+                  <td>40 min</td>
+                  <td><span class="badge badge-warning">On delivery</span></td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>Harish</td>
+                  <td>9009998888</td>
+                  <td>Bike</td>
+                  <td>25 min</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modal-add-customer">
+    <div class="modal">
+      <button class="close-btn" onclick="closeModal('modal-add-customer')">✕</button>
+      <h3>Add customer</h3>
+      <div class="form-group"><label>Full name</label><input type="text" placeholder="e.g. Rahul Sharma" /></div>
+      <div class="form-group"><label>Email</label><input type="email" placeholder="email@example.com" /></div>
+      <div class="form-group"><label>Phone</label><input type="tel" placeholder="10-digit number" /></div>
+      <div class="form-group"><label>City</label><input type="text" placeholder="e.g. Chennai" /></div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('modal-add-customer')">Cancel</button>
+        <button class="btn btn-primary"
+          onclick="fakeAdd('modal-add-customer','Customer added successfully')">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modal-add-vendor">
+    <div class="modal">
+      <button class="close-btn" onclick="closeModal('modal-add-vendor')">✕</button>
+      <h3>Add vendor</h3>
+      <div class="form-group"><label>Restaurant name</label><input type="text" placeholder="e.g. Spice Hub" /></div>
+      <div class="form-group"><label>Location</label><input type="text" placeholder="e.g. T Nagar, Chennai" /></div>
+      <div class="form-group"><label>Contact number</label><input type="tel" placeholder="10-digit number" /></div>
+      <div class="form-group"><label>Initial rating</label><select>
+          <option>4.0</option>
+          <option>4.1</option>
+          <option>4.2</option>
+          <option>4.3</option>
+          <option>4.4</option>
+          <option>4.5</option>
+        </select></div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('modal-add-vendor')">Cancel</button>
+        <button class="btn btn-primary" onclick="fakeAdd('modal-add-vendor','Vendor added successfully')">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modal-add-food">
+    <div class="modal">
+      <button class="close-btn" onclick="closeModal('modal-add-food')">✕</button>
+      <h3>Add food item</h3>
+      <div class="form-group"><label>Food name</label><input type="text" placeholder="e.g. Paneer Tikka" /></div>
+      <div class="form-group"><label>Price (₹)</label><input type="number" placeholder="e.g. 200" /></div>
+      <div class="form-group"><label>Vendor</label><select>
+          <option>Spice Hub</option>
+          <option>Sweet Treats</option>
+          <option>Burger Point</option>
+          <option>Pizza Palace</option>
+          <option>Dosa Corner</option>
+          <option>Biryani House</option>
+        </select></div>
+      <div class="form-group"><label>Availability</label><select>
+          <option>Available</option>
+          <option>Out of stock</option>
+        </select></div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('modal-add-food')">Cancel</button>
+        <button class="btn btn-primary" onclick="fakeAdd('modal-add-food','Food item added successfully')">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modal-add-delivery">
+    <div class="modal">
+      <button class="close-btn" onclick="closeModal('modal-add-delivery')">✕</button>
+      <h3>Add delivery partner</h3>
+      <div class="form-group"><label>Name</label><input type="text" placeholder="e.g. Arjun" /></div>
+      <div class="form-group"><label>Phone</label><input type="tel" placeholder="10-digit number" /></div>
+      <div class="form-group"><label>Vehicle type</label><select>
+          <option>Bike</option>
+          <option>Scooter</option>
+          <option>Car</option>
+        </select></div>
+      <div class="form-group"><label>Avg delivery time</label><input type="text" placeholder="e.g. 30 minutes" /></div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('modal-add-delivery')">Cancel</button>
+        <button class="btn btn-primary"
+          onclick="fakeAdd('modal-add-delivery','Partner added successfully')">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+  function nav(page, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    el.classList.add('active');
+  }
+  function openModal(id) { document.getElementById(id).classList.add('open') }
+  function closeModal(id) { document.getElementById(id).classList.remove('open') }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+  function fakeAdd(modalId, msg) { closeModal(modalId); showToast(msg) }
+  function filterTable(input, tableId) {
+    const q = input.value.toLowerCase();
+    document.querySelectorAll('#' + tableId + ' tbody tr').forEach(r => {
+      r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+  function filterTableByCol(sel, tableId, col) {
+    const q = sel.value.toLowerCase();
+    document.querySelectorAll('#' + tableId + ' tbody tr').forEach(r => {
+      const cell = r.cells[col];
+      r.style.display = (!q || cell && cell.textContent.toLowerCase() === q) ? '' : 'none';
+    });
+  }
+  function filterOrderStatus(sel) {
+    const q = sel.value.toLowerCase();
+    document.querySelectorAll('#order-table tbody tr').forEach(r => {
+      const badge = r.cells[4].querySelector('.badge');
+      r.style.display = (!q || badge && badge.textContent.toLowerCase() === q) ? '' : 'none';
+    });
+  }
+  document.querySelectorAll('.modal-backdrop').forEach(b => {
+    b.addEventListener('click', e => { if (e.target === b) b.classList.remove('open') });
+  });
+
+  async function loadData() {
+    try {
+      const custRes = await fetch('/api/customers');
+      const customers = await custRes.json();
+      const custTbody = document.getElementById('customer-tbody');
+      custTbody.innerHTML = customers.map(c => `<tr><td>${c.id}</td><td>${c.name}</td><td>${c.email}</td><td>${c.phone}</td><td>${c.city}</td></tr>`).join('');
+
+      const vendRes = await fetch('/api/vendors');
+      const vendors = await vendRes.json();
+      const vendTbody = document.getElementById('vendor-tbody');
+      vendTbody.innerHTML = vendors.map(v => `<tr><td>${v.id}</td><td>${v.name}</td><td>${v.location}</td><td>${v.contact}</td><td><span class="stars">★★★★★</span> ${v.rating}</td><td><span class="badge badge-success">${v.status}</span></td></tr>`).join('');
+    } catch (error) {
+      console.error('Error loading data:', error);
+    }
+  }
+
+  // Load data on start
+  loadData();
+
+  if (sessionStorage.getItem('simulation') === 'admin') {
+    const highlightMsg = document.createElement('div');
+    highlightMsg.innerHTML = 'Admin Portal: Verifying system-wide logs...';
+    highlightMsg.style = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--accent); color:white; padding:15px 30px; border-radius:30px; font-weight:800; z-index:9999; box-shadow:0 10px 30px rgba(255,107,107,0.4); animation: fadeInUp 0.5s; font-family: "Outfit"; font-size: 1.1rem; transition: all 0.5s;';
+    document.body.appendChild(highlightMsg);
+
+    const checkInterval = setInterval(() => {
+      const firstRow = document.querySelector('tbody tr:first-child');
+      if(firstRow) {
+        clearInterval(checkInterval);
+        firstRow.style.backgroundColor = 'rgba(32, 201, 151, 0.15)';
+        firstRow.style.borderLeft = '6px solid #20C997';
+        
+        highlightMsg.innerHTML = 'DBMS End-to-End Simulation Complete.';
+        highlightMsg.style.background = '#20C997';
+        highlightMsg.style.boxShadow = '0 10px 30px rgba(32,201,151,0.4)';
+        sessionStorage.removeItem('simulation');
+        
+        const statCards = document.querySelectorAll('.stat-card');
+        if(statCards.length > 0) {
+          statCards[0].style.boxShadow = '0 0 0 4px #20C997';
+          statCards[0].style.transform = 'translateY(-10px)';
+        }
+      }
+    }, 500);
+  }
+</script>

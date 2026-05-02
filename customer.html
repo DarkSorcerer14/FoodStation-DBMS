@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FoodStation — Order from Multiple Vendors</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F8F8FA; --surface: #FFFFFF; --border: #E8E8EC;
+      --text: #111; --text-sub: #6E6E73; --accent: #E8380D;
+      --accent-hover: #C52E0A; --accent-glow: rgba(232,56,13,0.12);
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', -apple-system, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+
+    /* Header */
+    header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 14px 5%; display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px);
+    }
+    .logo { font-size: 20px; font-weight: 800; letter-spacing: -1px; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a { text-decoration: none; color: var(--text-sub); font-weight: 600; font-size: 14px; transition: color 0.2s; letter-spacing: -0.2px; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-pill { background: var(--text); color: #fff !important; padding: 8px 18px; border-radius: 10px; font-size: 13px !important; }
+
+    /* Hero */
+    .hero {
+      margin: 24px 5%; border-radius: 24px; background: #0A0A0A; color: #fff;
+      padding: 64px; display: flex; align-items: center; position: relative; overflow: hidden;
+    }
+    .hero::after {
+      content: ''; position: absolute; top: 0; right: 0; width: 50%; height: 100%;
+      background: url('https://images.unsplash.com/photo-1543353071-087092ec393a?auto=format&fit=crop&q=80') center/cover;
+      opacity: 0.5; mask-image: linear-gradient(to right, transparent 5%, black 50%);
+      -webkit-mask-image: linear-gradient(to right, transparent 5%, black 50%);
+    }
+    .hero-content { z-index: 2; max-width: 480px; }
+    .hero h1 { font-size: 2.8rem; font-weight: 900; line-height: 1.08; letter-spacing: -2.5px; margin-bottom: 16px; }
+    .hero p { font-size: 15px; color: #A1A1A6; line-height: 1.6; font-weight: 400; }
+
+    /* Sections */
+    .container { max-width: 1400px; margin: 0 auto; padding: 40px 5%; }
+    .section-title { font-size: 22px; font-weight: 800; margin-bottom: 28px; letter-spacing: -0.8px; }
+
+    /* Grid */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+
+    /* Cards */
+    .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; cursor: pointer; transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .card:hover { transform: translateY(-6px); box-shadow: 0 24px 48px rgba(0,0,0,0.06); border-color: transparent; }
+    .card-img { width: 100%; height: 200px; object-fit: cover; display: block; transition: transform 0.5s; }
+    .card:hover .card-img { transform: scale(1.04); }
+    .card-content { padding: 20px 22px; }
+    .card-title { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; display: flex; justify-content: space-between; align-items: center; }
+    .card-meta { display: flex; gap: 10px; color: var(--text-sub); font-size: 13px; font-weight: 500; margin-top: 8px; }
+    .rating { color: #1D7D3F; background: #E8F5ED; padding: 3px 10px; border-radius: 8px; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 3px; }
+
+    .btn-dark {
+      background: var(--text); color: #fff; border: none; padding: 12px 20px; border-radius: 12px;
+      font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s; letter-spacing: -0.2px;
+    }
+    .btn-dark:hover { background: var(--accent); }
+
+    /* Cart FAB */
+    #cart-btn {
+      display: none; position: fixed; bottom: 28px; right: 28px; z-index: 900;
+      background: var(--accent); color: #fff; padding: 16px 28px; border-radius: 16px;
+      font-weight: 700; font-size: 14px; cursor: pointer; letter-spacing: -0.3px;
+      box-shadow: 0 8px 30px var(--accent-glow); transition: all 0.25s;
+    }
+    #cart-btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 12px 40px rgba(232,56,13,0.3); }
+
+    /* Cart Modal */
+    #cart-modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px); z-index: 1001; align-items: center; justify-content: center;
+    }
+    .cart-panel {
+      background: var(--surface); border-radius: 24px; padding: 36px; width: 420px; max-width: 92%;
+      box-shadow: 0 32px 64px rgba(0,0,0,0.15); animation: modalIn 0.35s cubic-bezier(0.16,1,0.3,1);
+    }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(20px) scale(0.97); } to { opacity: 1; transform: none; } }
+    .cart-panel h3 { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 24px; }
+    .cart-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-sub); float: right; }
+    .cart-divider { height: 1px; background: var(--border); margin: 20px 0; }
+    .cart-total-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
+    .cart-total-row span:last-child { color: var(--accent); }
+    .pay-label { font-size: 11px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; margin-top: 20px; }
+    .pay-select {
+      width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border);
+      font-family: 'Inter'; font-size: 14px; font-weight: 500; outline: none; background: var(--bg);
+    }
+    .pay-select:focus { border-color: var(--accent); }
+    .btn-checkout {
+      width: 100%; padding: 16px; border: none; border-radius: 14px;
+      background: var(--accent); color: #fff; font-size: 15px; font-weight: 700;
+      cursor: pointer; margin-top: 20px; font-family: 'Inter'; letter-spacing: -0.3px;
+      box-shadow: 0 4px 16px var(--accent-glow); transition: all 0.25s;
+    }
+    .btn-checkout:hover { filter: brightness(1.08); transform: translateY(-2px); }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: -80px; left: 50%; transform: translateX(-50%);
+      background: #1D1D1F; color: #fff; padding: 14px 28px; border-radius: 14px;
+      font-weight: 600; font-size: 14px; z-index: 2000; letter-spacing: -0.2px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2); transition: bottom 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+    #toast.show { bottom: 28px; }
+
+    /* Menu View */
+    #menu-view { display: none; }
+    .vendor-hero { height: 340px; background-size: cover; background-position: center; position: relative; }
+    .vendor-hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%); }
+    .vendor-hero-content { position: absolute; bottom: 44px; left: 5%; color: #fff; }
+    .vendor-hero-content h1 { font-size: 2.8rem; font-weight: 900; letter-spacing: -2px; }
+    .back-btn {
+      position: absolute; top: 28px; left: 5%; background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(16px); color: #fff; border: 1px solid rgba(255,255,255,0.15);
+      padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer;
+      font-family: 'Inter'; font-size: 14px; transition: all 0.2s;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.2); }
+
+    .loading { color: var(--text-sub); font-size: 14px; font-weight: 500; padding: 40px 0; text-align: center; }
+
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 768px) {
+      .hero { padding: 40px 24px; border-radius: 16px; margin: 16px 4%; }
+      .hero h1 { font-size: 2rem; }
+      .hero::after { width: 100%; opacity: 0.25; }
+      .grid { grid-template-columns: 1fr; gap: 16px; }
+      .container { padding: 24px 4%; }
+      .nav-links { gap: 16px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="toast"><span id="toast-msg">Item added to cart!</span></div>
+
+  <div id="cart-btn" onclick="openCart()">Cart (<span id="cart-count">0</span>)</div>
+
+  <div id="cart-modal">
+    <div class="cart-panel">
+      <button class="cart-close" onclick="closeCart()">&times;</button>
+      <h3>Your Order</h3>
+      <div id="cart-items"></div>
+      <div class="cart-divider"></div>
+      <div class="cart-total-row"><span>Total</span><span id="cart-total">₹0</span></div>
+      <label class="pay-label">Payment Method</label>
+      <select class="pay-select" id="payment-method">
+        <option>Credit/Debit Card</option>
+        <option>UPI / Netbanking</option>
+        <option>Cash on Delivery</option>
+      </select>
+      <button class="btn-checkout" id="checkout-btn" onclick="checkout()">Place Order</button>
+    </div>
+  </div>
+
+  <header>
+    <a href="/index.html" class="logo">Food<span>Station</span></a>
+    <div class="nav-links">
+      <a href="/index.html">Home</a>
+      <a href="#">Orders</a>
+      <a href="#" class="nav-pill">Profile</a>
+    </div>
+  </header>
+
+  <div id="vendors-view">
+  <div id="main-view">
+    <div class="hero">
+      <div class="hero-content">
+        <h1>Your online food court, unified.</h1>
+        <p>Order from multiple restaurants in a single checkout. Powered by FoodStation's multi-vendor platform.</p>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="section-title">All Restaurants</div>
+      <div class="grid" id="vendor-grid">
+        <div class="loading">Discovering kitchens...</div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div id="menu-view">
+    <div id="vendor-hero-bg" class="vendor-hero">
+      <div class="vendor-hero-overlay"></div>
+      <button class="back-btn" onclick="showRestaurants()">← Back</button>
+      <div class="vendor-hero-content">
+        <h1 id="menu-vendor-name">Restaurant</h1>
+      </div>
+    </div>
+    <div class="container">
+      <div class="section-title" id="menu-title">Menu</div>
+      <div class="grid" id="menu-grid">
+        <div class="loading">Loading menu...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const vendorImages = {
+      1: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&q=80",
+      2: "https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&q=80",
+      3: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80",
+      4: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&q=80",
+      5: "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&q=80",
+      6: "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?auto=format&fit=crop&q=80",
+      7: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&q=80",
+      8: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80",
+      9: "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&q=80",
+      10: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80"
+    };
+
+    let allFoods = [];
+    let cart = [];
+
+    function addToCart(id, name, price) {
+      cart.push({ id, name, price });
+      document.getElementById('cart-btn').style.display = 'flex';
+      document.getElementById('cart-count').textContent = cart.length;
+      showToast(name);
+      const cartBtn = document.getElementById('cart-btn');
+      cartBtn.style.transform = 'scale(1.1)';
+      setTimeout(() => cartBtn.style.transform = 'scale(1)', 200);
+    }
+
+    function openCart() {
+      document.getElementById('cart-modal').style.display = 'flex';
+      const itemsHtml = cart.map((item) => `
+        <div style="display:flex; justify-content:space-between; padding:10px 0; font-size:14px; font-weight:600;">
+          <span>${item.name}</span><span style="color:var(--text-sub);">₹${item.price}</span>
+        </div>
+      `).join('');
+      document.getElementById('cart-items').innerHTML = itemsHtml || '<div style="color:var(--text-sub); font-size:14px;">Cart is empty.</div>';
+      const total = cart.reduce((sum, item) => sum + item.price, 0);
+      document.getElementById('cart-total').textContent = '₹' + total;
+    }
+
+    function closeCart() { document.getElementById('cart-modal').style.display = 'none'; }
+
+    async function checkout() {
+      if (cart.length === 0) return alert('Cart is empty!');
+      const total = cart.reduce((sum, item) => sum + item.price, 0);
+      const btn = document.getElementById('checkout-btn');
+      const originalText = btn.innerHTML;
+      btn.textContent = 'Processing...';
+      btn.style.opacity = '0.7';
+      try {
+        const res = await fetch('/api/orders', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ total_amount: total, customer_id: 1 })
+        });
+        const data = await res.json();
+        if (data.success) {
+          setTimeout(() => {
+            alert('Payment Successful! Your order has been securely placed.');
+            cart = [];
+            document.getElementById('cart-btn').style.display = 'none';
+            closeCart();
+            btn.innerHTML = originalText;
+            btn.style.opacity = '1';
+            showRestaurants();
+          }, 1500);
+        } else { throw new Error(data.error || 'Failed to process order.'); }
+      } catch(e) {
+        alert('Error placing order: ' + e.message);
+        btn.innerHTML = originalText; btn.style.opacity = '1';
+      }
+    }
+
+    async function loadData() {
+      try {
+        const vendorRes = await fetch('/api/vendors');
+        const vendors = await vendorRes.json();
+        const grid = document.getElementById('vendor-grid');
+        const foodRes = await fetch('/api/food-items');
+        allFoods = await foodRes.json();
+        if (vendors && vendors.length > 0) {
+          grid.innerHTML = vendors.map((v, i) => `
+            <div class="card" onclick="viewMenu(${v.id}, '${v.name}')" style="animation: fadeInUp 0.5s ${i * 0.06}s backwards;">
+              <div style="overflow:hidden; border-radius: var(--radius) var(--radius) 0 0;">
+                <img src="${vendorImages[v.id] || vendorImages[1]}" class="card-img" alt="${v.name}">
+              </div>
+              <div class="card-content">
+                <div class="card-title">${v.name}<div class="rating"><span>★</span> ${v.rating || '4.5'}</div></div>
+                <div class="card-meta"><span>${v.location || 'Local'}</span><span style="color:var(--accent); font-weight:600;">30 min</span></div>
+              </div>
+            </div>
+          `).join('');
+        } else { grid.innerHTML = '<div class="loading">No restaurants found.</div>'; }
+      } catch (err) { console.error(err); }
+    }
+
+    function viewMenu(vendorId, vendorName) {
+      document.getElementById('vendors-view').style.display = 'none';
+      document.getElementById('menu-view').style.display = 'block';
+      document.getElementById('menu-title').textContent = vendorName + ' — Menu';
+      document.getElementById('menu-vendor-name').textContent = vendorName;
+      const heroEl = document.getElementById('vendor-hero-bg');
+      heroEl.style.backgroundImage = `url('${vendorImages[vendorId] || vendorImages[1]}')`;
+      const menuGrid = document.getElementById('menu-grid');
+      const vendorFoods = allFoods.filter(f => f.vendor_id === vendorId);
+      if (vendorFoods.length > 0) {
+        menuGrid.innerHTML = vendorFoods.map((f, i) => `
+          <div class="card" style="animation: fadeInUp 0.4s ${i * 0.08}s backwards;">
+            <div class="card-content">
+              <div class="card-title" style="margin-bottom:4px;">${f.name}</div>
+              <div class="card-meta" style="margin-bottom:16px;">
+                <span style="font-weight:800; color:var(--accent);">₹${f.price}</span>
+                <span style="background:var(--accent-glow); color:var(--accent); padding:3px 10px; border-radius:8px; font-weight:700; font-size:12px;">${f.category}</span>
+              </div>
+              <button class="btn-dark" data-id="${f.id}" data-name="${f.name.replace(/"/g, '&quot;')}" data-price="${f.price}" style="width:100%;" onclick="event.stopPropagation(); addToCart(parseInt(this.dataset.id), this.dataset.name, parseFloat(this.dataset.price))">Add to Cart</button>
+            </div>
+          </div>
+        `).join('');
+      } else { menuGrid.innerHTML = '<div class="loading">No items available.</div>'; }
+      document.getElementById('menu-view').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function showToast(itemName) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = itemName + ' added to cart!';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function showRestaurants() {
+      document.getElementById('menu-view').style.display = 'none';
+      document.getElementById('vendors-view').style.display = 'block';
+    }
+
+    loadData();
+  </script>
+  <script>
+    if (sessionStorage.getItem('simulation') === 'customer') {
+      const highlightMsg = document.createElement('div');
+      highlightMsg.innerHTML = 'System Simulation: Customer Authentication...';
+      highlightMsg.style = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--accent); color:white; padding:12px 28px; border-radius:14px; font-weight:700; z-index:9999; box-shadow:0 8px 30px rgba(232,56,13,0.3); font-family:"Inter"; font-size:14px; letter-spacing:-0.3px;';
+      document.body.appendChild(highlightMsg);
+
+      window.alert = (msg) => {
+        showToast(msg);
+        if (msg.includes('Successful')) {
+           highlightMsg.innerHTML = 'Transaction Complete: Syncing Vendor Data...';
+           highlightMsg.style.background = '#1D7D3F';
+           highlightMsg.style.boxShadow = '0 8px 30px rgba(29,125,63,0.3)';
+           setTimeout(() => {
+             sessionStorage.setItem('simulation', 'vendor');
+             window.location.href = 'vendor.html';
+           }, 2500);
+        }
+      };
+
+      const checkInterval = setInterval(() => {
+        const cards = document.querySelectorAll('#vendor-grid .card');
+        if(cards.length > 1) {
+          clearInterval(checkInterval);
+          cards[0].style.boxShadow = '0 0 0 3px var(--accent)';
+          cards[0].style.transform = 'translateY(-8px)';
+          highlightMsg.innerHTML = 'Simulation: Selecting Vendor 1 (Multi-Vendor Order)...';
+          setTimeout(() => {
+            cards[0].click();
+            const menuInterval1 = setInterval(() => {
+              const addBtn = document.querySelector('#menu-grid .btn-dark');
+              if(addBtn) {
+                clearInterval(menuInterval1);
+                addBtn.style.boxShadow = '0 0 0 3px var(--accent)';
+                highlightMsg.innerHTML = 'Simulation: Adding item from Vendor 1...';
+                setTimeout(() => {
+                  addBtn.click();
+                  setTimeout(() => {
+                    highlightMsg.innerHTML = 'Simulation: Returning to Food Court...';
+                    document.querySelector('#menu-view button').click();
+                    setTimeout(() => {
+                      cards[1].style.boxShadow = '0 0 0 3px var(--accent)';
+                      cards[1].style.transform = 'translateY(-8px)';
+                      highlightMsg.innerHTML = 'Simulation: Selecting Vendor 2...';
+                      setTimeout(() => {
+                        cards[1].click();
+                        const menuInterval2 = setInterval(() => {
+                          const addBtn2 = document.querySelector('#menu-grid .btn-dark');
+                          if(addBtn2) {
+                            clearInterval(menuInterval2);
+                            addBtn2.style.boxShadow = '0 0 0 3px var(--accent)';
+                            highlightMsg.innerHTML = 'Simulation: Adding item from Vendor 2...';
+                            setTimeout(() => {
+                              addBtn2.click();
+                              setTimeout(() => {
+                                const cartBtn = document.getElementById('cart-btn');
+                                cartBtn.style.boxShadow = '0 0 0 3px #fff, 0 0 0 6px var(--accent)';
+                                cartBtn.click();
+                                highlightMsg.innerHTML = 'Simulation: Multi-Vendor Checkout...';
+                                setTimeout(() => {
+                                  const checkoutBtn = document.getElementById('checkout-btn');
+                                  checkoutBtn.style.boxShadow = '0 0 0 3px var(--accent)';
+                                  checkoutBtn.click();
+                                  highlightMsg.innerHTML = 'Simulation: Processing Database Transaction...';
+                                }, 1500);
+                              }, 1500);
+                            }, 1000);
+                          }
+                        }, 500);
+                      }, 1000);
+                    }, 1000);
+                  }, 1000);
+                }, 1000);
+              }
+            }, 500);
+          }, 1500);
+        }
+      }, 500);
+    }
+  </script>
+</body>
+</html>

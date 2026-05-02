@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoodStation — Vendor Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F8F8FA; --surface: #FFFFFF; --border: #E8E8EC;
+    --text: #111; --text-sub: #6E6E73; --accent: #E8380D;
+    --accent-glow: rgba(232,56,13,0.1); --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+
+  header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 14px 5%; display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-size: 20px; font-weight: 800; letter-spacing: -1px; }
+  .logo span { color: var(--accent); }
+  .nav { display: flex; gap: 20px; }
+  .nav a { text-decoration: none; color: var(--text-sub); font-weight: 600; font-size: 14px; transition: color 0.2s; }
+  .nav a:hover { color: var(--text); }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 40px 5%; }
+  .page-title { font-size: 28px; font-weight: 900; letter-spacing: -1.5px; margin-bottom: 8px; }
+  .page-sub { font-size: 14px; color: var(--text-sub); margin-bottom: 32px; font-weight: 400; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 28px; transition: box-shadow 0.3s;
+  }
+  .card:hover { box-shadow: 0 12px 32px rgba(0,0,0,0.04); }
+  .card h3 {
+    font-size: 15px; font-weight: 700; letter-spacing: -0.2px; margin-bottom: 20px;
+    padding-bottom: 16px; border-bottom: 1px solid var(--border); color: var(--text);
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid var(--border); }
+  td { padding: 14px 12px; font-size: 14px; font-weight: 500; border-bottom: 1px solid #f4f4f5; }
+  tr:last-child td { border-bottom: none; }
+
+  .status-select {
+    padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;
+    border: 1px solid var(--border); cursor: pointer; outline: none;
+    font-family: 'Inter'; background: var(--bg); transition: border-color 0.2s;
+  }
+  .status-select:focus { border-color: var(--accent); }
+  .status-placed { color: #B45309; background: #FEF3C7; border-color: #FDE68A; }
+  .status-preparing { color: #1D4ED8; background: #DBEAFE; border-color: #BFDBFE; }
+  .status-transit { color: #7C3AED; background: #EDE9FE; border-color: #DDD6FE; }
+  .status-delivered { color: #1D7D3F; background: #E8F5ED; border-color: #BBF7D0; }
+
+  .table-responsive { width: 100%; overflow-x: auto; }
+
+  @media (max-width: 768px) {
+    .grid { grid-template-columns: 1fr; }
+    .page-title { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo">Food<span>Station</span> <span style="font-size:12px; font-weight:600; color:var(--text-sub); letter-spacing:0; margin-left:8px;">VENDOR</span></div>
+    <div class="nav"><a href="/index.html">Home</a><a href="#">Settings</a></div>
+  </header>
+
+  <div class="container">
+    <div class="page-title">Dashboard</div>
+    <div class="page-sub">Manage incoming orders and your restaurant menu.</div>
+    <div class="grid">
+      <div class="card">
+        <h3>Active Orders</h3>
+        <div class="table-responsive">
+          <table>
+            <thead><tr><th>Order</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody id="orders-tbody"><tr><td colspan="4" style="color:var(--text-sub);">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Menu Items</h3>
+        <div class="table-responsive">
+          <table>
+            <thead><tr><th>ID</th><th>Name</th><th>Price</th><th>Category</th></tr></thead>
+            <tbody id="menu-tbody"><tr><td colspan="4" style="color:var(--text-sub);">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function getStatusClass(s) {
+      if (s === 'Delivered') return 'status-delivered';
+      if (s === 'Preparing') return 'status-preparing';
+      if (s === 'Out for Delivery') return 'status-transit';
+      return 'status-placed';
+    }
+    async function loadData() {
+      try {
+        const orderRes = await fetch('/api/orders');
+        const orders = await orderRes.json();
+        const ordersTbody = document.getElementById('orders-tbody');
+        if (orders.length > 0) {
+          ordersTbody.innerHTML = orders.map(o => `<tr><td style="font-weight:700;">#${o.OrderID}</td><td>${new Date(o.OrderDate).toLocaleDateString()}</td><td>₹${o.TotalAmount}</td><td>
+            <select class="status-select ${getStatusClass(o.OrderStatus)}" onchange="updateStatus(${o.OrderID}, this.value)">
+              <option value="Placed" ${o.OrderStatus === 'Placed' ? 'selected' : ''}>Placed</option>
+              <option value="Preparing" ${o.OrderStatus === 'Preparing' ? 'selected' : ''}>Preparing</option>
+              <option value="Out for Delivery" ${o.OrderStatus === 'Out for Delivery' ? 'selected' : ''}>Out for Delivery</option>
+              <option value="Delivered" ${o.OrderStatus === 'Delivered' ? 'selected' : ''}>Delivered</option>
+            </select>
+          </td></tr>`).join('');
+        } else {
+          ordersTbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-sub);">No active orders.</td></tr>';
+        }
+        const menuRes = await fetch('/api/food-items');
+        const menu = await menuRes.json();
+        const menuTbody = document.getElementById('menu-tbody');
+        if (menu.length > 0) {
+          menuTbody.innerHTML = menu.map(m => `<tr><td style="font-weight:700;">#${m.id}</td><td>${m.name}</td><td>₹${m.price}</td><td><span style="background:var(--accent-glow); color:var(--accent); padding:3px 10px; border-radius:8px; font-size:12px; font-weight:700;">${m.category}</span></td></tr>`).join('');
+        } else {
+          menuTbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-sub);">No menu items.</td></tr>';
+        }
+      } catch (err) { console.error(err); }
+    }
+    async function updateStatus(id, newStatus) {
+      try {
+        await fetch('/api/orders/' + id + '/status', {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        loadData();
+      } catch (e) { console.error(e); }
+    }
+    loadData();
+  </script>
+  <script>
+    if (sessionStorage.getItem('simulation') === 'vendor') {
+      const highlightMsg = document.createElement('div');
+      highlightMsg.innerHTML = 'Vendor Portal: Syncing live orders from Database...';
+      highlightMsg.style = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--accent); color:white; padding:12px 28px; border-radius:14px; font-weight:700; z-index:9999; box-shadow:0 8px 30px rgba(232,56,13,0.3); font-family:"Inter"; font-size:14px;';
+      document.body.appendChild(highlightMsg);
+      const checkInterval = setInterval(() => {
+        const firstRow = document.querySelector('#orders-tbody tr:first-child');
+        if(firstRow && firstRow.innerText.includes('#')) {
+          clearInterval(checkInterval);
+          firstRow.style.backgroundColor = 'rgba(232,56,13,0.06)';
+          firstRow.style.borderLeft = '4px solid var(--accent)';
+          firstRow.style.transition = 'all 0.4s';
+          highlightMsg.innerHTML = 'New Order Received & Highlighted! Redirecting to Admin...';
+          setTimeout(() => {
+            sessionStorage.setItem('simulation', 'admin');
+            window.location.href = 'food_delivery_admin_dashboard.html';
+          }, 3500);
+        }
+      }, 500);
+    }
+  </script>
+</body>
+</html>
