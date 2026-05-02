@@ -1,45 +1,45 @@
 # FoodStation — Multi-Vendor Food Delivery System
 
-FoodStation is a full-stack multi-vendor food delivery platform developed as a DBMS project. It allows customers to order from multiple restaurants in a single checkout process, demonstrating end-to-end database operations across Customer, Vendor, and Admin roles.
+FoodStation is a full-stack multi-vendor food delivery platform developed as a Database Management Systems (DBMS) project. It enables customers to order from multiple restaurants within a single checkout process, showcasing end-to-end database operations across Customer, Vendor, and Admin roles.
 
-## 🚀 Key Features
-- **Multi-Vendor Checkout**: Order from multiple restaurants simultaneously.
+## Key Features
+- **Multi-Vendor Checkout**: Seamlessly order from multiple restaurants in a single transaction.
 - **Role-Based Dashboards**:
-  - **Customer**: Browse food items by category/vendor and manage cart.
-  - **Vendor**: Manage orders, update status (Placed, Preparing, Out for Delivery, Delivered), and view menu items.
-  - **Admin**: Monitor system metrics, view all data tables, and manage platform health.
-- **End-to-End Simulation**: Autonomous flow demonstrating the lifecycle of an order from placement to delivery.
-- **Premium UI**: Modern design system using DM Sans typography and a vibrant red-orange accent (`#E8380D`).
+  - **Customer Portal**: Browse food items by category or vendor, manage shopping carts, and place orders.
+  - **Vendor Dashboard**: Manage incoming orders, update real-time status (Placed, Preparing, Out for Delivery, Delivered), and monitor menu items.
+  - **Admin Panel**: Monitor system-wide metrics, view all data tables, and manage platform health.
+- **End-to-End Simulation**: An autonomous flow demonstrating the complete lifecycle of an order from placement to final delivery.
+- **Modern UI Design**: High-fidelity design system utilizing DM Sans typography and a professional color palette with a vibrant red-orange accent (`#E8380D`).
 
-## 🛠️ Tech Stack
+## Technical Stack
 | Layer | Technology |
 |---|---|
 | **Frontend** | Vanilla HTML5, CSS3 (Flexbox/Grid), JavaScript (ES6+) |
 | **Backend** | Node.js, Express.js |
 | **Database** | MySQL |
-| **Styling** | Google Fonts (DM Sans), Custom CSS |
+| **Typography** | DM Sans (via Google Fonts) |
 
-## 📂 File Structure
-- `index.html`: Role-based login and system simulation entry point.
-- `customer.html`: Customer portal for browsing and ordering.
-- `vendor.html`: Dashboard for restaurant owners to manage their orders.
-- `food_delivery_admin_dashboard.html`: Comprehensive admin panel for platform monitoring.
-- `server.js`: Express server handles API requests and MySQL connectivity.
-- `schema.sql`: SQL script for database initialization and seeding.
-- `.env`: Environment variables for database credentials.
+## Project Structure
+- `index.html`: Entry point featuring role-based authentication simulation and system flow triggers.
+- `customer.html`: Primary interface for customer browsing and order placement.
+- `vendor.html`: Management interface for restaurant owners to process orders.
+- `food_delivery_admin_dashboard.html`: Comprehensive administrative dashboard for platform oversight.
+- `server.js`: Express application handling REST API endpoints and database connectivity.
+- `schema.sql`: Database definition and initial data seeding script.
+- `.env`: Secure configuration for database credentials and environment variables.
 
-## ⚙️ Setup & Installation
+## Installation and Setup
 
 ### Prerequisites
-- Node.js (v14+)
+- Node.js (Version 14 or higher)
 - MySQL Server
 
-### Database Setup
-1. Create a database named `fooddeliverydb`.
-2. Run the queries in `schema.sql` to create tables and seed initial data.
+### Database Initialization
+1. Create a new MySQL database named `fooddeliverydb`.
+2. Execute the `schema.sql` script to initialize tables and seed the initial dataset.
 
 ### Configuration
-Create a `.env` file in the root directory with the following:
+Configure your database credentials by creating a `.env` file in the root directory:
 ```env
 DB_HOST=localhost
 DB_USER=root
@@ -47,32 +47,35 @@ DB_PASSWORD=your_mysql_password
 DB_NAME=fooddeliverydb
 ```
 
-### Running the App
-1. Install dependencies:
+### Execution
+1. Install project dependencies:
    ```bash
    npm install
    ```
-2. Start the server:
+2. Start the application server:
    ```bash
    node server.js
    ```
-3. Open `index.html` in your browser (or access via `http://localhost:3000`).
+3. Access the application by opening `index.html` in a web browser or navigating to `http://localhost:3000`.
 
-## 🔌 API Endpoints
-| Method | Route | Description |
+## API Documentation
+| Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/food-items` | Fetch all available food items. |
-| `GET` | `/api/vendors` | Fetch all registered vendors. |
-| `GET` | `/api/customers` | Fetch all registered customers. |
-| `GET` | `/api/orders` | Fetch all orders (latest first). |
-| `POST` | `/api/orders` | Place a new order. |
-| `PUT` | `/api/orders/:id/status` | Update the status of an existing order. |
+| `GET` | `/api/food-items` | Retrieves all available food items. |
+| `GET` | `/api/vendors` | Retrieves a list of all registered vendors. |
+| `GET` | `/api/customers` | Retrieves a list of all registered customers. |
+| `GET` | `/api/orders` | Retrieves order history, sorted by most recent first. |
+| `POST` | `/api/orders` | Creates a new order record in the database. |
+| `PUT` | `/api/orders/:id/status` | Updates the status of a specific order. |
 
-## 🔮 Future Improvements
-- **Live Metrics**: Replace static admin statistics with real-time SQL aggregations.
-- **Authentication**: Implement JWT or Session-based authentication for secure access.
-- **Persistence**: Add `localStorage` support for cart persistence across refreshes.
-- **Real-time Updates**: Integrate WebSockets for instant order notifications to vendors.
+## Future Development
+- **Dynamic Analytics**: Transition from static administrative metrics to live SQL-aggregated data.
+- **Secure Authentication**: Implement JWT or session-based authentication protocols.
+- **Cart Persistence**: Utilize `localStorage` or server-side sessions for persistent shopping carts.
+- **Real-time Notifications**: Integrate WebSockets for instantaneous order alerts to vendors.
 
 ---
-Developed as a DBMS Project by [DarkSorcerer14](https://github.com/DarkSorcerer14).
+
+### Developed By
+- **Ayush Aryan** (RA2411003012173)
+- **Vivek Kumar Prusty** (RA2411003012179)
