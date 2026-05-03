@@ -9,10 +9,11 @@ A full-stack multi-vendor food delivery platform (like EatSure/online food court
 
 ## Current State
 - **Frontend**: All 4 pages complete with premium DM Sans design system and FoodStation branding.
-- **Backend**: Node.js + Express running on port 3000 with 6 API endpoints.
-- **Database**: MySQL `fooddeliverydb` — 60 food items seeded (6 per vendor, 10 vendors).
+- **Backend**: Node.js + Express running on port 3000 with 11 API endpoints.
+- **Database**: MySQL `fooddeliverydb` — 60 food items seeded (6 per vendor, 10 vendors), plus orders, payments, and delivery partners.
 - **Simulation**: Fully autonomous E2E simulation from Login → Customer (multi-vendor order) → Vendor → Admin.
-- **Vendor Controls**: Order status dropdown (Placed/Preparing/Out for Delivery/Delivered) with live DB updates.
+- **Vendor Controls**: Order status dropdown with live DB updates.
+- **Admin Dashboard**: Fully dynamic — live metrics (Revenue, Orders, Customers), dynamic charts, and comprehensive data tables.
 
 ---
 
@@ -31,12 +32,13 @@ A full-stack multi-vendor food delivery platform (like EatSure/online food court
 ## File Structure
 | File | Purpose |
 |---|---|
-| `index.html` | Login — role selector, "Run System Simulation" button |
-| `customer_portal.html` | Customer portal — browse, cart, multi-vendor checkout |
-| `vendor_dashboard.html` | Vendor dashboard — orders with status dropdown, menu items |
-| `admin_dashboard.html` | Admin panel — sidebar nav, metrics, all data tables |
-| `app_server.js` | Express backend — API endpoints, DB connection, seeding |
-| `.env` | `DB_PASSWORD=DarkSorcerer@014` |
+| `index.html` | Entry Point — Login role selector, registration, "Run System Simulation" |
+| `customer_portal.html` | Customer Portal — Browse restaurants, cart, multi-vendor checkout |
+| `vendor_dashboard.html` | Vendor Dashboard — Manage orders, menu items, status updates |
+| `admin_dashboard.html` | Admin Panel — Live metrics, Revenue charts, Data management |
+| `app_server.js` | Express Backend — API endpoints, DB connection, seeding logic |
+| `database_setup.sql` | SQL Schema — Table structures and initial seed data |
+| `.env` | Environment Config — `DB_PASSWORD=DarkSorcerer@014` |
 
 ---
 
@@ -44,62 +46,47 @@ A full-stack multi-vendor food delivery platform (like EatSure/online food court
 | Method | Route | Description |
 |---|---|---|
 | GET | `/api/food-items` | All food items |
+| GET | `/api/food-items-detailed` | Food items with vendor names |
 | GET | `/api/vendors` | All vendors |
 | GET | `/api/customers` | All customers |
-| GET | `/api/orders` | All orders (sorted by `OrderDate DESC`) |
-| POST | `/api/orders` | Place new order (`{ total_amount, customer_id }`) |
-| PUT | `/api/orders/:id/status` | Update order status (`{ status }`) |
+| POST | `/api/customers` | Register new customer |
+| POST | `/api/vendors` | Register new vendor |
+| GET | `/api/orders` | All orders |
+| GET | `/api/orders-detailed` | Orders with customer names |
+| POST | `/api/orders` | Place new order |
+| PUT | `/api/orders/:id/status` | Update order status |
+| GET | `/api/payments` | All transaction logs |
+| GET | `/api/delivery-partners` | All delivery personnel |
+| GET | `/api/dashboard-stats` | Aggregated metrics for Admin |
 
 ---
 
 ## Database Schema
 
-### `orders` (No AUTO_INCREMENT on OrderID)
-Backend uses `SELECT MAX(OrderID) + 1` before every INSERT.
-Columns: `OrderID`, `CustomerID`, `OrderDate`, `TotalAmount`, `OrderStatus`
+### `orders` (AUTO_INCREMENT on OrderID)
+Columns: `OrderID`, `CustomerID`, `vendor_id`, `OrderDate`, `TotalAmount`, `OrderStatus`, `payment`
 
-### `food_items` (60 items, 6 per vendor)
+### `food_items` (60 items)
 Columns: `id`, `name`, `price`, `vendor_id`, `category`, `status`
 
-### `vendors` (10 vendors)
-Cuisine-specific Unsplash images mapped in `customer_portal.html` vendorImages object.
+### `payments`
+Columns: `id`, `order_id`, `method`, `status`, `date`
 
----
-
-## Design System
-| Token | Value |
-|---|---|
-| Font | `DM Sans` |
-| Accent | `#E8380D` |
-| Background | `#F8F8FA` |
-| Surface | `#FFFFFF` |
-| Border | `#E8E8EC` |
-| Text | `#111` |
-| Text Muted | `#6E6E73` |
-| Login BG | `#000` with radial glow |
-
----
-
-## E2E Simulation Flow
-Uses `sessionStorage` to chain state across pages:
-1. Login → Customer: Selects 2 vendors, adds item from each, multi-vendor checkout
-2. Customer → Vendor: Highlights new order from DB
-3. Vendor → Admin: Shows system-wide data highlighted
-4. Clears session on completion
+### `delivery_partners`
+Columns: `id`, `name`, `phone`, `vehicle`, `avg_time`, `status`
 
 ---
 
 ## Known Issues
-- **No auth** — role-simulated via dropdown
-- **No cart persistence** — JS memory only, lost on refresh
-- **OrderID** — manual MAX+1 (no AUTO_INCREMENT)
-- **Admin metrics** — hardcoded static values, not live DB queries
+- **No auth** — role-simulated via dropdown (Login emails pre-filled)
+- **No cart persistence** — JS memory only
+- **Order items** — individual items per order not yet stored in a separate table
 
 ---
 
 ## How to Run
 ```bash
-cd "c:\Users\ayush\Downloads\DBMS Project"
+cd "c:\Users\ayush\FoodStation_DBMS"
 node app_server.js
 # http://localhost:3000
 ```
@@ -108,8 +95,8 @@ Requires MySQL running + `.env` with `DB_PASSWORD=DarkSorcerer@014`.
 ---
 
 ## Next Steps
-1. Live admin metrics — replace static stats with `COUNT(*)`/`SUM()` queries
-2. Cart persistence — `localStorage`
-3. Auth system — JWT or sessions
-4. Real-time vendor updates — polling or WebSockets
-5. Order items table — store individual food items per order
+1. Cart persistence — `localStorage`
+2. Auth system — JWT or sessions
+3. Real-time vendor updates — polling or WebSockets
+4. Order items table — store individual food items per order
+5. Multi-city support — location-based vendor filtering

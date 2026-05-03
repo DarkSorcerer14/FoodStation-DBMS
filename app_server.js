@@ -135,7 +135,7 @@ app.get('/api/dashboard-stats', (req, res) => {
 // Setup dummy tables if not exist on start
 const setupSql = `
 CREATE TABLE IF NOT EXISTS food_items (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), price INT, vendor_id INT, category VARCHAR(50), status VARCHAR(20));
-CREATE TABLE IF NOT EXISTS orders (id INT AUTO_INCREMENT PRIMARY KEY, customer_id INT, vendor_id INT, date DATETIME DEFAULT CURRENT_TIMESTAMP, amount INT, status VARCHAR(20), payment VARCHAR(20));
+CREATE TABLE IF NOT EXISTS orders (OrderID INT AUTO_INCREMENT PRIMARY KEY, CustomerID INT, vendor_id INT, OrderDate DATETIME DEFAULT CURRENT_TIMESTAMP, TotalAmount INT, OrderStatus VARCHAR(20), payment VARCHAR(20));
 CREATE TABLE IF NOT EXISTS customers (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), email VARCHAR(100) UNIQUE, phone VARCHAR(15), city VARCHAR(50));
 CREATE TABLE IF NOT EXISTS vendors (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), location VARCHAR(200), contact VARCHAR(15), rating DECIMAL(2,1), status VARCHAR(20));
 
@@ -224,6 +224,18 @@ INSERT IGNORE INTO food_items (id, name, price, vendor_id, category, status) VAL
 (58, 'Green Detox Juice', 150, 10, 'Healthy', 'Available'),
 (59, 'Grilled Chicken Salad', 260, 10, 'Healthy', 'Available'),
 (60, 'Fresh Fruit Bowl', 180, 10, 'Healthy', 'Available');
+
+INSERT IGNORE INTO orders (OrderID, CustomerID, vendor_id, OrderDate, TotalAmount, OrderStatus, payment) VALUES
+(1, 1, 1, '2024-03-01 12:30:00', 330, 'Delivered', 'UPI'),
+(2, 2, 2, '2024-03-02 14:15:00', 120, 'Delivered', 'Credit Card'),
+(3, 3, 3, '2024-03-03 18:45:00', 250, 'Processing', 'Cash on Delivery'),
+(4, 4, 4, '2024-03-04 10:15:00', 300, 'Placed', 'UPI'),
+(5, 5, 5, '2024-03-05 13:45:00', 90, 'Delivered', 'Debit Card'),
+(6, 6, 6, '2024-03-06 19:30:00', 220, 'Processing', 'Cash on Delivery'),
+(7, 7, 7, '2024-03-07 20:00:00', 350, 'Placed', 'Credit Card'),
+(8, 8, 8, '2024-03-08 11:20:00', 100, 'Delivered', 'UPI'),
+(9, 9, 9, '2024-03-09 15:10:00', 280, 'Delivered', 'Net Banking'),
+(10, 10, 10, '2024-03-10 18:00:00', 120, 'Processing', 'UPI');
 
 CREATE TABLE IF NOT EXISTS payments (id INT AUTO_INCREMENT PRIMARY KEY, order_id INT, method VARCHAR(50), status VARCHAR(20), date DATETIME DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS delivery_partners (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), phone VARCHAR(15), vehicle VARCHAR(50), avg_time VARCHAR(20), status VARCHAR(20));
