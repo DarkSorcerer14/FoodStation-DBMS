@@ -91,6 +91,47 @@ app.put('/api/orders/:id/status', (req, res) => {
   });
 });
 
+app.get('/api/orders-detailed', (req, res) => {
+  db.query('SELECT o.*, c.name as customer_name FROM orders o LEFT JOIN customers c ON o.CustomerID = c.id ORDER BY o.OrderDate DESC', (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
+app.get('/api/food-items-detailed', (req, res) => {
+  db.query('SELECT f.*, v.name as vendor_name FROM food_items f LEFT JOIN vendors v ON f.vendor_id = v.id', (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
+app.get('/api/payments', (req, res) => {
+  db.query('SELECT p.*, o.TotalAmount FROM payments p LEFT JOIN orders o ON p.order_id = o.OrderID ORDER BY p.date DESC', (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
+app.get('/api/delivery-partners', (req, res) => {
+  db.query('SELECT * FROM delivery_partners', (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
+app.get('/api/dashboard-stats', (req, res) => {
+  db.query('SELECT COUNT(*) as cnt, COALESCE(SUM(TotalAmount),0) as rev FROM orders', (e1, r1) => {
+    if (e1) return res.status(500).json({ error: e1.message });
+    db.query('SELECT COUNT(*) as cnt FROM vendors WHERE status="Active"', (e2, r2) => {
+      if (e2) return res.status(500).json({ error: e2.message });
+      db.query('SELECT COUNT(*) as cnt FROM customers', (e3, r3) => {
+        if (e3) return res.status(500).json({ error: e3.message });
+        res.json({ totalOrders: r1[0].cnt, totalRevenue: r1[0].rev, activeVendors: r2[0].cnt, totalCustomers: r3[0].cnt });
+      });
+    });
+  });
+});
+
 // Setup dummy tables if not exist on start
 const setupSql = `
 CREATE TABLE IF NOT EXISTS food_items (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), price INT, vendor_id INT, category VARCHAR(50), status VARCHAR(20));
@@ -183,6 +224,23 @@ INSERT IGNORE INTO food_items (id, name, price, vendor_id, category, status) VAL
 (58, 'Green Detox Juice', 150, 10, 'Healthy', 'Available'),
 (59, 'Grilled Chicken Salad', 260, 10, 'Healthy', 'Available'),
 (60, 'Fresh Fruit Bowl', 180, 10, 'Healthy', 'Available');
+
+CREATE TABLE IF NOT EXISTS payments (id INT AUTO_INCREMENT PRIMARY KEY, order_id INT, method VARCHAR(50), status VARCHAR(20), date DATETIME DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS delivery_partners (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), phone VARCHAR(15), vehicle VARCHAR(50), avg_time VARCHAR(20), status VARCHAR(20));
+
+INSERT IGNORE INTO payments (id, order_id, method, status, date) VALUES
+(1,1,'UPI','Completed','2024-03-01 12:31:00'),(2,2,'Credit Card','Completed','2024-03-02 14:20:00'),
+(3,3,'Cash on Delivery','Pending','2024-03-03 18:50:00'),(4,4,'UPI','Completed','2024-03-04 10:20:00'),
+(5,5,'Debit Card','Completed','2024-03-05 13:50:00'),(6,6,'Cash on Delivery','Pending','2024-03-06 19:35:00'),
+(7,7,'Credit Card','Completed','2024-03-07 20:05:00'),(8,8,'UPI','Completed','2024-03-08 11:25:00'),
+(9,9,'Net Banking','Completed','2024-03-09 15:15:00'),(10,10,'UPI','Pending','2024-03-10 18:05:00');
+
+INSERT IGNORE INTO delivery_partners (id, name, phone, vehicle, avg_time, status) VALUES
+(1,'Arjun','9998887777','Bike','35 min','Available'),(2,'Ravi','9887776666','Scooter','25 min','Available'),
+(3,'Manoj','9776665555','Bike','40 min','On delivery'),(4,'Suresh','9665554444','Bike','30 min','Available'),
+(5,'Deepak','9554443333','Scooter','28 min','Available'),(6,'Ramesh','9443332222','Bike','45 min','On delivery'),
+(7,'Kiran','9332221111','Bike','35 min','Available'),(8,'Ajay','9221110000','Scooter','20 min','Available'),
+(9,'Naveen','9110009999','Bike','40 min','On delivery'),(10,'Harish','9009998888','Bike','25 min','Available');
 `;
 
 setupSql.split(';').forEach(query => {
