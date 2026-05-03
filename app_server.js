@@ -134,6 +134,16 @@ app.get('/api/dashboard-stats', (req, res) => {
 
 // Setup dummy tables if not exist on start
 const setupSql = `
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS payments;
+DROP TABLE IF EXISTS payment;
+DROP TABLE IF EXISTS delivery_partners;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS food_items;
+DROP TABLE IF EXISTS vendors;
+DROP TABLE IF EXISTS customers;
+SET FOREIGN_KEY_CHECKS = 1;
+
 CREATE TABLE IF NOT EXISTS food_items (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), price INT, vendor_id INT, category VARCHAR(50), status VARCHAR(20));
 CREATE TABLE IF NOT EXISTS orders (OrderID INT AUTO_INCREMENT PRIMARY KEY, CustomerID INT, vendor_id INT, OrderDate DATETIME DEFAULT CURRENT_TIMESTAMP, TotalAmount INT, OrderStatus VARCHAR(20), payment VARCHAR(20));
 CREATE TABLE IF NOT EXISTS customers (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), email VARCHAR(100) UNIQUE, phone VARCHAR(15), city VARCHAR(50));
