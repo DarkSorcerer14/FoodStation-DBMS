@@ -134,6 +134,31 @@
 
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 
+    /* Success Modal */
+    #success-modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(12px); z-index: 2001; align-items: center; justify-content: center;
+    }
+    .success-card {
+      background: var(--surface); border-radius: 28px; padding: 48px 40px; width: 400px; text-align: center;
+      box-shadow: 0 32px 64px rgba(0,0,0,0.2); animation: modalIn 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+    .success-icon {
+      width: 80px; height: 80px; background: #E8F5ED; color: #1D7D3F;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 40px; margin: 0 auto 24px; animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes scaleIn { from { transform: scale(0); } to { transform: scale(1); } }
+    .success-card h2 { font-size: 24px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.8px; }
+    .success-card p { color: var(--text-sub); font-size: 15px; line-height: 1.5; margin-bottom: 32px; }
+    
+    .btn-track {
+      width: 100%; padding: 16px; border: none; border-radius: 14px;
+      background: var(--text); color: #fff; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-track:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+
     @media (max-width: 768px) {
       .hero { padding: 40px 24px; border-radius: 16px; margin: 16px 4%; }
       .hero h1 { font-size: 2rem; }
@@ -149,6 +174,15 @@
   <div id="toast"><span id="toast-msg">Item added to cart!</span></div>
 
   <div id="cart-btn" onclick="openCart()">Cart (<span id="cart-count">0</span>)</div>
+
+  <div id="success-modal">
+    <div class="success-card">
+      <div class="success-icon">✓</div>
+      <h2>Order Placed!</h2>
+      <p>Your delicious meal is being prepared. You can track your order in the dashboard.</p>
+      <button class="btn-track" onclick="location.href='vendor_dashboard.html'">Track Order</button>
+    </div>
+  </div>
 
   <div id="cart-modal">
     <div class="cart-panel">
@@ -225,12 +259,21 @@
     };
 
     let allFoods = [];
-    let cart = [];
+    let cart = JSON.parse(localStorage.getItem('foodstation_cart')) || [];
+
+    function updateCartUI() {
+      if (cart.length > 0) {
+        document.getElementById('cart-btn').style.display = 'flex';
+        document.getElementById('cart-count').textContent = cart.length;
+      } else {
+        document.getElementById('cart-btn').style.display = 'none';
+      }
+      localStorage.setItem('foodstation_cart', JSON.stringify(cart));
+    }
 
     function addToCart(id, name, price) {
-      cart.push({ id, name, price });
-      document.getElementById('cart-btn').style.display = 'flex';
-      document.getElementById('cart-count').textContent = cart.length;
+      cart.push({ id, name, price, quantity: 1 });
+      updateCartUI();
       showToast(name);
       const cartBtn = document.getElementById('cart-btn');
       cartBtn.style.transform = 'scale(1.1)';
@@ -261,18 +304,22 @@
       try {
         const res = await fetch('/api/orders', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ total_amount: total, customer_id: 1 })
+          body: JSON.stringify({ total_amount: total, customer_id: 1, items: cart })
         });
         const data = await res.json();
         if (data.success) {
           setTimeout(() => {
-            alert('Payment Successful! Your order has been securely placed.');
             cart = [];
-            document.getElementById('cart-btn').style.display = 'none';
+            updateCartUI();
             closeCart();
             btn.innerHTML = originalText;
             btn.style.opacity = '1';
-            showRestaurants();
+            
+            // Show Success Modal
+            document.getElementById('success-modal').style.display = 'flex';
+            
+            // For Simulation
+            if (window.onOrderSuccess) window.onOrderSuccess();
           }, 1500);
         } else { throw new Error(data.error || 'Failed to process order.'); }
       } catch(e) {
@@ -342,6 +389,7 @@
       document.getElementById('vendors-view').style.display = 'block';
     }
 
+    updateCartUI();
     loadData();
   </script>
   <script>
@@ -351,17 +399,14 @@
       highlightMsg.style = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--accent); color:white; padding:12px 28px; border-radius:14px; font-weight:700; z-index:9999; box-shadow:0 8px 30px rgba(232,56,13,0.3); font-family:"Inter"; font-size:14px; letter-spacing:-0.3px;';
       document.body.appendChild(highlightMsg);
 
-      window.alert = (msg) => {
-        showToast(msg);
-        if (msg.includes('Successful')) {
-           highlightMsg.innerHTML = 'Transaction Complete: Syncing Vendor Data...';
-           highlightMsg.style.background = '#1D7D3F';
-           highlightMsg.style.boxShadow = '0 8px 30px rgba(29,125,63,0.3)';
-           setTimeout(() => {
-             sessionStorage.setItem('simulation', 'vendor');
-             window.location.href = 'vendor_dashboard.html';
-           }, 2500);
-        }
+      window.onOrderSuccess = () => {
+         highlightMsg.innerHTML = 'Transaction Complete: Syncing Vendor Data...';
+         highlightMsg.style.background = '#1D7D3F';
+         highlightMsg.style.boxShadow = '0 8px 30px rgba(29,125,63,0.3)';
+         setTimeout(() => {
+           sessionStorage.setItem('simulation', 'vendor');
+           window.location.href = 'vendor_dashboard.html';
+         }, 2500);
       };
 
       const checkInterval = setInterval(() => {

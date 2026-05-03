@@ -66,19 +66,24 @@ app.get('/api/orders', (req, res) => {
 });
 
 app.post('/api/orders', (req, res) => {
-  const { total_amount, customer_id } = req.body;
+  const { total_amount, customer_id, items } = req.body;
   const status = 'Placed';
 
-  db.query('SELECT MAX(OrderID) as maxId FROM orders', (err, rows) => {
+  db.query('INSERT INTO orders (OrderDate, TotalAmount, OrderStatus, CustomerID) VALUES (NOW(), ?, ?, ?)', 
+    [total_amount, status, customer_id || 1], (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
     
-    const nextOrderId = (rows[0].maxId || 0) + 1;
-    const query = 'INSERT INTO orders (OrderID, OrderDate, TotalAmount, OrderStatus, CustomerID) VALUES (?, NOW(), ?, ?, ?)';
+    const orderId = result.insertId;
     
-    db.query(query, [nextOrderId, total_amount, status, customer_id || 1], (insertErr) => {
-      if (insertErr) return res.status(500).json({ error: insertErr.message });
-      res.json({ success: true, orderId: nextOrderId });
-    });
+    if (items && items.length > 0) {
+      const values = items.map(item => [orderId, item.id, item.quantity || 1, item.price]);
+      db.query('INSERT INTO order_items (order_id, food_id, quantity, price) VALUES ?', [values], (itemErr) => {
+        if (itemErr) console.error('Error inserting order items:', itemErr);
+        res.json({ success: true, orderId: orderId });
+      });
+    } else {
+      res.json({ success: true, orderId: orderId });
+    }
   });
 });
 
@@ -135,8 +140,8 @@ app.get('/api/dashboard-stats', (req, res) => {
 // Setup dummy tables if not exist on start
 const setupSql = `
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS payments;
-DROP TABLE IF EXISTS payment;
 DROP TABLE IF EXISTS delivery_partners;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS food_items;
@@ -146,6 +151,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE IF NOT EXISTS food_items (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), price INT, vendor_id INT, category VARCHAR(50), status VARCHAR(20));
 CREATE TABLE IF NOT EXISTS orders (OrderID INT AUTO_INCREMENT PRIMARY KEY, CustomerID INT, vendor_id INT, OrderDate DATETIME DEFAULT CURRENT_TIMESTAMP, TotalAmount INT, OrderStatus VARCHAR(20), payment VARCHAR(20));
+CREATE TABLE IF NOT EXISTS order_items (id INT AUTO_INCREMENT PRIMARY KEY, order_id INT, food_id INT, quantity INT, price INT, FOREIGN KEY (order_id) REFERENCES orders(OrderID));
 CREATE TABLE IF NOT EXISTS customers (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), email VARCHAR(100) UNIQUE, phone VARCHAR(15), city VARCHAR(50));
 CREATE TABLE IF NOT EXISTS vendors (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), location VARCHAR(200), contact VARCHAR(15), rating DECIMAL(2,1), status VARCHAR(20));
 
