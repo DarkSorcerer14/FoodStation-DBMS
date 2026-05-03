@@ -35,6 +35,22 @@ app.get('/api/vendors', (req, res) => {
   });
 });
 
+app.post('/api/customers', (req, res) => {
+  const { name, email, phone, city } = req.body;
+  db.query('INSERT INTO customers (name, email, phone, city) VALUES (?, ?, ?, ?)', [name, email, phone, city], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ success: true, id: result.insertId });
+  });
+});
+
+app.post('/api/vendors', (req, res) => {
+  const { name, location, contact, rating, status } = req.body;
+  db.query('INSERT INTO vendors (name, location, contact, rating, status) VALUES (?, ?, ?, ?, ?)', [name, location, contact, rating || 4.0, status || 'Active'], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ success: true, id: result.insertId });
+  });
+});
+
 app.get('/api/food-items', (req, res) => {
   db.query('SELECT * FROM food_items', (err, results) => {
     if (err) return res.status(500).json({ error: err.message });

@@ -152,7 +152,7 @@
     <form id="loginForm" onsubmit="handleLogin(event)">
       <div class="form-group">
         <label>Role</label>
-        <select id="role" required>
+        <select id="role" required onchange="updateEmail()">
           <option value="customer">Customer</option>
           <option value="vendor">Restaurant Vendor</option>
           <option value="admin">System Admin</option>
@@ -161,7 +161,7 @@
 
       <div class="form-group">
         <label>Email</label>
-        <input type="email" id="email" placeholder="you@example.com" required value="demo@foodstation.com">
+        <input type="email" id="email" placeholder="you@example.com" required value="customer@foodstation.com">
       </div>
 
       <div class="form-group">
@@ -171,25 +171,79 @@
 
       <button type="submit" class="btn-login">Sign In</button>
     </form>
+    <div style="text-align:center; margin-top:20px;">
+      <span style="font-size:13px; color:var(--text-sub);">New here?</span>
+      <button onclick="openRegister()" style="background:none; border:none; color:var(--accent); font-weight:700; font-size:13px; cursor:pointer; font-family:'DM Sans'; text-decoration:underline;">Create Account</button>
+    </div>
     <div class="footer-text">Powered by <span>FoodStation</span> DBMS</div>
   </div>
 
+  <!-- Register Modal -->
+  <div id="reg-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(8px); z-index:200; align-items:center; justify-content:center;">
+    <div style="background:rgba(255,255,255,0.06); backdrop-filter:blur(40px); border:1px solid rgba(255,255,255,0.1); border-radius:24px; padding:36px; width:420px; max-width:92%; animation:cardIn 0.4s;">
+      <button onclick="closeRegister()" style="float:right; background:none; border:none; color:var(--text-sub); font-size:20px; cursor:pointer;">&times;</button>
+      <h2 style="font-size:22px; font-weight:800; letter-spacing:-1px; margin-bottom:24px;">Create Account</h2>
+      <div class="form-group">
+        <label>Register As</label>
+        <select id="reg-type" onchange="toggleRegFields()" style="width:100%; padding:14px 16px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:var(--text); font-size:15px;">
+          <option value="customer">Customer</option>
+          <option value="vendor">Vendor / Restaurant</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Full Name / Restaurant Name</label><input id="reg-name" type="text" placeholder="Enter name" required></div>
+      <div class="form-group"><label>Email</label><input id="reg-email" type="email" placeholder="email@example.com" required></div>
+      <div class="form-group"><label>Phone</label><input id="reg-phone" type="tel" placeholder="10-digit number" required></div>
+      <div id="cust-fields"><div class="form-group"><label>City</label><input id="reg-city" type="text" placeholder="e.g. Chennai" value="Chennai"></div></div>
+      <div id="vend-fields" style="display:none;"><div class="form-group"><label>Location</label><input id="reg-location" type="text" placeholder="e.g. T Nagar, Chennai"></div></div>
+      <button onclick="submitRegister()" style="width:100%; padding:15px; border:none; border-radius:14px; background:var(--accent); color:#fff; font-size:15px; font-weight:700; cursor:pointer; font-family:'DM Sans'; margin-top:8px; box-shadow:0 4px 20px var(--accent-glow); transition:all 0.3s;" id="reg-btn">Register</button>
+    </div>
+  </div>
+
   <script>
+    const roleEmails = { customer: 'customer@foodstation.com', vendor: 'vendor@foodstation.com', admin: 'admin@foodstation.com' };
+    function updateEmail() { document.getElementById('email').value = roleEmails[document.getElementById('role').value]; }
+    function openRegister() { document.getElementById('reg-modal').style.display = 'flex'; }
+    function closeRegister() { document.getElementById('reg-modal').style.display = 'none'; }
+    function toggleRegFields() {
+      const isVendor = document.getElementById('reg-type').value === 'vendor';
+      document.getElementById('cust-fields').style.display = isVendor ? 'none' : 'block';
+      document.getElementById('vend-fields').style.display = isVendor ? 'block' : 'none';
+    }
+    async function submitRegister() {
+      const type = document.getElementById('reg-type').value;
+      const name = document.getElementById('reg-name').value;
+      const email = document.getElementById('reg-email').value;
+      const phone = document.getElementById('reg-phone').value;
+      if (!name || !email || !phone) return alert('Please fill all fields');
+      const btn = document.getElementById('reg-btn');
+      btn.textContent = 'Registering...'; btn.style.opacity = '0.7';
+      try {
+        let body, url;
+        if (type === 'customer') {
+          url = '/api/customers';
+          body = { name, email, phone, city: document.getElementById('reg-city').value || 'Chennai' };
+        } else {
+          url = '/api/vendors';
+          body = { name, location: document.getElementById('reg-location').value || 'Chennai', contact: phone };
+        }
+        const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        const data = await res.json();
+        if (data.success) { alert('Registration successful! You can now sign in.'); closeRegister(); }
+        else { alert('Error: ' + (data.error || 'Registration failed')); }
+      } catch (e) { alert('Error: ' + e.message); }
+      btn.textContent = 'Register'; btn.style.opacity = '1';
+    }
+
     function handleLogin(event) {
       event.preventDefault();
       const role = document.getElementById('role').value;
       const btn = document.querySelector('.btn-login');
       btn.textContent = 'Authenticating...';
       btn.style.opacity = '0.8';
-
       setTimeout(() => {
-        if (role === 'customer') {
-          window.location.href = '/customer_portal.html';
-        } else if (role === 'vendor') {
-          window.location.href = '/vendor_dashboard.html';
-        } else if (role === 'admin') {
-          window.location.href = '/admin_dashboard.html';
-        }
+        if (role === 'customer') window.location.href = '/customer_portal.html';
+        else if (role === 'vendor') window.location.href = '/vendor_dashboard.html';
+        else if (role === 'admin') window.location.href = '/admin_dashboard.html';
       }, 800);
     }
   </script>
