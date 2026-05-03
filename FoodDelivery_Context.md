@@ -11,7 +11,7 @@ A full-stack multi-vendor food delivery platform built as a DBMS project. The sy
 - **Frontend**: All 4 pages complete with premium DM Sans design system.
 - **Backend**: Node.js + Express (Port 3000) with 12 API endpoints.
 - **Database**: MySQL `fooddeliverydb` — Comprehensive schema with orders, payments, and delivery partners.
-- **Admin Dashboard**: 100% Dynamic — Live metrics (Revenue, Orders, Customers), dynamic charts, and comprehensive data tables.
+- **Admin Dashboard**: 100% Dynamic — Enhanced high-contrast typography for accessibility. Live metrics, dynamic charts, and comprehensive data tables.
 
 ---
 
