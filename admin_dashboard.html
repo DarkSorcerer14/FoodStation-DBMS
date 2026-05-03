@@ -959,15 +959,15 @@
       // Revenue by Vendor (Simple bars)
       const revMap = {};
       orders.forEach(o => {
-         const vId = o.vendor_id || 1; // Fallback for simulation
-         revMap[vId] = (revMap[vId] || 0) + o.TotalAmount;
+         const vId = o.vendor_id || 1;
+         revMap[vId] = (revMap[vId] || 0) + Number(o.TotalAmount);
       });
       const topRev = Math.max(...Object.values(revMap), 1000);
       document.getElementById('revenue-bars').innerHTML = vendors.slice(0, 5).map(v => `
         <div class="bar-row">
           <div class="bar-label">${v.name}</div>
-          <div class="bar-track"><div class="bar-fill" style="width:${(revMap[v.id] || 0) / topRev * 100}%;background:#E8380D"></div></div>
-          <div class="bar-val">₹${revMap[v.id] || 0}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${((revMap[v.id] || 0) / topRev) * 100}%;background:#E8380D"></div></div>
+          <div class="bar-val">₹${(revMap[v.id] || 0).toLocaleString()}</div>
         </div>
       `).join('');
 
@@ -1018,15 +1018,15 @@
 
       // Payments Page Metrics
       const completedPay = payments.filter(p => p.status === 'Completed');
-      const totalCollected = completedPay.reduce((s, p) => s + (p.TotalAmount || 0), 0);
+      const totalCollected = completedPay.reduce((s, p) => s + Number(p.TotalAmount || 0), 0);
       const pendingPay = payments.filter(p => p.status === 'Pending');
-      const totalPending = pendingPay.reduce((s, p) => s + (p.TotalAmount || 0), 0);
+      const totalPending = pendingPay.reduce((s, p) => s + Number(p.TotalAmount || 0), 0);
       
       document.getElementById('pay-collected').textContent = '₹' + totalCollected.toLocaleString();
       document.getElementById('pay-success-count').textContent = completedPay.length + ' completed';
       document.getElementById('pay-pending').textContent = '₹' + totalPending.toLocaleString();
       document.getElementById('pay-pending-count').textContent = pendingPay.length + ' transactions';
-      document.getElementById('pay-rate').textContent = Math.round((completedPay.length / payments.length) * 100) + '%';
+      document.getElementById('pay-rate').textContent = (payments.length ? Math.round((completedPay.length / payments.length) * 100) : 0) + '%';
 
       // 8. Delivery Partners
       const delRes = await fetch('/api/delivery-partners');

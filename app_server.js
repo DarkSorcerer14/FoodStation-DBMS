@@ -6,7 +6,7 @@ require('dotenv').config();
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static('./')); // Serve static files like html
+app.use(express.static('./')); 
 
 const db = mysql.createConnection({
   host: process.env.DB_HOST || 'localhost',
@@ -120,7 +120,7 @@ app.get('/api/delivery-partners', (req, res) => {
 });
 
 app.get('/api/dashboard-stats', (req, res) => {
-  db.query('SELECT COUNT(*) as cnt, COALESCE(SUM(TotalAmount),0) as rev FROM orders', (e1, r1) => {
+  db.query('SELECT COUNT(*) as cnt, CAST(COALESCE(SUM(TotalAmount),0) AS SIGNED) as rev FROM orders', (e1, r1) => {
     if (e1) return res.status(500).json({ error: e1.message });
     db.query('SELECT COUNT(*) as cnt FROM vendors WHERE status="Active"', (e2, r2) => {
       if (e2) return res.status(500).json({ error: e2.message });
