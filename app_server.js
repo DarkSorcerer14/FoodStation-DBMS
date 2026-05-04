@@ -52,14 +52,24 @@ app.post('/api/vendors', (req, res) => {
 });
 
 app.get('/api/food-items', (req, res) => {
-  db.query('SELECT * FROM food_items', (err, results) => {
+  const vendorId = req.query.vendorId;
+  const query = vendorId ? 'SELECT * FROM food_items WHERE vendor_id = ?' : 'SELECT * FROM food_items';
+  db.query(query, vendorId ? [vendorId] : [], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
   });
 });
 
 app.get('/api/orders', (req, res) => {
-  db.query('SELECT * FROM orders ORDER BY OrderDate DESC', (err, results) => {
+  const vendorId = req.query.vendorId;
+  const query = vendorId 
+    ? `SELECT DISTINCT o.* FROM orders o 
+       LEFT JOIN order_items oi ON o.OrderID = oi.order_id 
+       LEFT JOIN food_items f ON oi.food_id = f.id 
+       WHERE o.vendor_id = ? OR f.vendor_id = ? ORDER BY o.OrderDate DESC` 
+    : 'SELECT * FROM orders ORDER BY OrderDate DESC';
+    
+  db.query(query, vendorId ? [vendorId, vendorId] : [], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
   });
@@ -84,6 +94,17 @@ app.post('/api/orders', (req, res) => {
     } else {
       res.json({ success: true, orderId: orderId });
     }
+
+    // Auto update status every 5 seconds
+    setTimeout(() => {
+      db.query('UPDATE orders SET OrderStatus = "Preparing" WHERE OrderID = ? AND OrderStatus = "Placed"', [orderId]);
+    }, 10000);
+    setTimeout(() => {
+      db.query('UPDATE orders SET OrderStatus = "Out for Delivery" WHERE OrderID = ? AND OrderStatus = "Preparing"', [orderId]);
+    }, 25000);
+    setTimeout(() => {
+      db.query('UPDATE orders SET OrderStatus = "Delivered" WHERE OrderID = ? AND OrderStatus = "Out for Delivery"', [orderId]);
+    }, 40000);
   });
 });
 

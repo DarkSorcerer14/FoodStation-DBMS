@@ -67,6 +67,9 @@
 <body>
   <header>
     <div class="logo">Food<span>Station</span> <span style="font-size:12px; font-weight:600; color:var(--text-sub); letter-spacing:0; margin-left:8px;">VENDOR</span></div>
+    <select id="vendor-switch" onchange="changeVendor(this.value)" style="padding:8px 12px; border-radius:10px; border:1px solid var(--border); font-family:'Inter'; font-size:14px; font-weight:600; outline:none; background:var(--bg); cursor:pointer; min-width: 160px; margin-left: auto; margin-right: 24px;">
+      <option value="1">Loading...</option>
+    </select>
     <div class="nav"><a href="/index.html">Home</a><a href="#">Settings</a></div>
   </header>
 
@@ -102,13 +105,30 @@
       if (s === 'Out for Delivery') return 'status-transit';
       return 'status-placed';
     }
+    let currentVendorId = sessionStorage.getItem('vendorId') || 1;
+
+    async function initVendorSelect() {
+      try {
+        const res = await fetch('/api/vendors');
+        const vendors = await res.json();
+        const select = document.getElementById('vendor-switch');
+        select.innerHTML = vendors.map(v => `<option value="${v.id}" ${v.id == currentVendorId ? 'selected' : ''}>${v.name}</option>`).join('');
+      } catch(e) { console.error(e); }
+    }
+
+    function changeVendor(id) {
+      currentVendorId = id;
+      sessionStorage.setItem('vendorId', id);
+      loadData();
+    }
+
     async function loadData() {
       try {
-        const orderRes = await fetch('/api/orders');
+        const orderRes = await fetch('/api/orders?vendorId=' + currentVendorId);
         const orders = await orderRes.json();
         const ordersTbody = document.getElementById('orders-tbody');
         if (orders.length > 0) {
-          ordersTbody.innerHTML = orders.map(o => `<tr><td style="font-weight:700;">#${o.OrderID}</td><td>${new Date(o.OrderDate).toLocaleDateString()}</td><td>₹${o.TotalAmount}</td><td>
+          ordersTbody.innerHTML = orders.map(o => `<tr><td style="font-weight:700;">#${o.OrderID} (Cust: ${o.CustomerID})</td><td>${new Date(o.OrderDate).toLocaleDateString()}</td><td>₹${o.TotalAmount}</td><td>
             <select class="status-select ${getStatusClass(o.OrderStatus)}" onchange="updateStatus(${o.OrderID}, this.value)">
               <option value="Placed" ${o.OrderStatus === 'Placed' ? 'selected' : ''}>Placed</option>
               <option value="Preparing" ${o.OrderStatus === 'Preparing' ? 'selected' : ''}>Preparing</option>
@@ -119,7 +139,7 @@
         } else {
           ordersTbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-sub);">No active orders.</td></tr>';
         }
-        const menuRes = await fetch('/api/food-items');
+        const menuRes = await fetch('/api/food-items?vendorId=' + currentVendorId);
         const menu = await menuRes.json();
         const menuTbody = document.getElementById('menu-tbody');
         if (menu.length > 0) {
@@ -138,28 +158,41 @@
         loadData();
       } catch (e) { console.error(e); }
     }
+    initVendorSelect();
     loadData();
+    setInterval(loadData, 3000);
   </script>
   <script>
     if (sessionStorage.getItem('simulation') === 'vendor') {
       const highlightMsg = document.createElement('div');
-      highlightMsg.innerHTML = 'Vendor Portal: Syncing live orders from Database...';
+      highlightMsg.innerHTML = 'Vendor Portal: Watching live orders...';
       highlightMsg.style = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--accent); color:white; padding:12px 28px; border-radius:14px; font-weight:700; z-index:9999; box-shadow:0 8px 30px rgba(232,56,13,0.3); font-family:"Inter"; font-size:14px;';
       document.body.appendChild(highlightMsg);
+      
+      let highlighted = false;
+
       const checkInterval = setInterval(() => {
         const firstRow = document.querySelector('#orders-tbody tr:first-child');
         if(firstRow && firstRow.innerText.includes('#')) {
-          clearInterval(checkInterval);
-          firstRow.style.backgroundColor = 'rgba(232,56,13,0.06)';
-          firstRow.style.borderLeft = '4px solid var(--accent)';
-          firstRow.style.transition = 'all 0.4s';
-          highlightMsg.innerHTML = 'New Order Received & Highlighted! Redirecting to Admin...';
-          setTimeout(() => {
-            sessionStorage.setItem('simulation', 'admin');
-            window.location.href = 'admin_dashboard.html';
-          }, 3500);
+          if (!highlighted) {
+            firstRow.style.backgroundColor = 'rgba(232,56,13,0.06)';
+            firstRow.style.borderLeft = '4px solid var(--accent)';
+            firstRow.style.transition = 'all 0.4s';
+            highlightMsg.innerHTML = 'Watching Live Status Updates...';
+            highlighted = true;
+          }
+
+          const statusSelect = firstRow.querySelector('.status-select');
+          if (statusSelect && statusSelect.value === 'Delivered') {
+            clearInterval(checkInterval);
+            highlightMsg.innerHTML = 'Order Delivered! Redirecting to Admin...';
+            setTimeout(() => {
+              sessionStorage.setItem('simulation', 'admin');
+              window.location.href = 'admin_dashboard.html';
+            }, 3000);
+          }
         }
-      }, 500);
+      }, 1000);
     }
   </script>
 </body>

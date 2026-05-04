@@ -180,7 +180,7 @@
       <div class="success-icon">✓</div>
       <h2>Order Placed!</h2>
       <p>Your delicious meal is being prepared. You can track your order in the dashboard.</p>
-      <button class="btn-track" onclick="location.href='vendor_dashboard.html'">Track Order</button>
+      <button class="btn-track" onclick="document.getElementById('success-modal').style.display='none'">OK</button>
     </div>
   </div>
 
@@ -205,8 +205,8 @@
     <a href="/index.html" class="logo">Food<span>Station</span></a>
     <div class="nav-links">
       <a href="/index.html">Home</a>
-      <a href="#">Orders</a>
-      <a href="#" class="nav-pill">Profile</a>
+      <a href="#" onclick="showToast('Order History feature coming soon!')">Orders</a>
+      <a href="#" class="nav-pill" onclick="showToast('Profile feature coming soon!')">Profile</a>
     </div>
   </header>
 
@@ -214,8 +214,8 @@
   <div id="main-view">
     <div class="hero">
       <div class="hero-content">
-        <h1>Your online food court, unified.</h1>
-        <p>Order from multiple restaurants in a single checkout. Powered by FoodStation's multi-vendor platform.</p>
+        <h1 style="font-size: 3.2rem; letter-spacing: -2px; margin-bottom: 20px;">Taste the city,<br>all in one place.</h1>
+        <p style="font-size: 16px; color: #D1D1D6; line-height: 1.6; max-width: 440px;">Mix and match from your favorite local restaurants. Experience the ultimate culinary freedom in a single, seamless checkout.</p>
       </div>
     </div>
 
@@ -304,7 +304,7 @@
       try {
         const res = await fetch('/api/orders', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ total_amount: total, customer_id: 1, items: cart })
+          body: JSON.stringify({ total_amount: total, customer_id: Math.floor(Math.random() * 10) + 1, items: cart })
         });
         const data = await res.json();
         if (data.success) {
@@ -400,13 +400,14 @@
       document.body.appendChild(highlightMsg);
 
       window.onOrderSuccess = () => {
-         highlightMsg.innerHTML = 'Transaction Complete: Syncing Vendor Data...';
+         highlightMsg.innerHTML = 'Transaction Complete: Switching to Vendor...';
          highlightMsg.style.background = '#1D7D3F';
          highlightMsg.style.boxShadow = '0 8px 30px rgba(29,125,63,0.3)';
          setTimeout(() => {
            sessionStorage.setItem('simulation', 'vendor');
+           sessionStorage.setItem('vendorId', 1);
            window.location.href = 'vendor_dashboard.html';
-         }, 2500);
+         }, 500);
       };
 
       const checkInterval = setInterval(() => {
